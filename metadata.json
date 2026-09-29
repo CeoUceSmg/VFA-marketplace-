@@ -1,0 +1,6 @@
+{
+  "name": "Firebase Multi-Portal System",
+  "description": "Multi-portal system comprising Admin, Vendor, Order, and Hub management with Firebase.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

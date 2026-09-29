@@ -1,0 +1,1636 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth antialiased bg-[#03040B]">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor Central | ViraForce Marketplace</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    },
+                    colors: {
+                        brand: { 900: '#050810', 800: '#0F1523', accent: '#00E5FF', emerald: '#00FF9D', pink: '#FF007F', gold: '#F5C000', purple: '#A855F7' },
+                        whatsapp: { bg: '#EFEAE2', sent: '#D9FDD3', received: '#FFFFFF', text: '#111B21', meta: '#667781', blueTick: '#53BDEB' }
+                    },
+                    animation: { 'fade-in-up': 'fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards' },
+                    keyframes: { fadeInUp: { '0%': { opacity: '0', transform: 'translateY(16px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } } }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #03040B; color: #E2E8F0; overflow-x: hidden; }
+        .ambient-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-image: radial-gradient(circle at 10% 20%, rgba(245, 192, 0, 0.05) 0%, transparent 40%), radial-gradient(circle at 90% 80%, rgba(0, 229, 255, 0.05) 0%, transparent 40%); z-index: -1; pointer-events: none; }
+        .glass-panel { background: rgba(10, 13, 20, 0.7); backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.7); }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+        .admin-input { background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.1); color: #fff; transition: all 0.2s; }
+        .admin-input:focus { outline: none; border-color: #F5C000; box-shadow: 0 0 0 2px rgba(245, 192, 0, 0.2); }
+        select.admin-input option { background-color: #0A0D14; color: #fff; }
+        .tab-btn { transition: all 0.2s ease; border-radius: 12px; }
+        .tab-btn.active { background: rgba(245, 192, 0, 0.1); color: #F5C000; border-left: 3px solid #F5C000; }
+        .tab-btn:hover:not(.active) { background: rgba(255,255,255,0.05); }
+        .view-section { display: none; }
+        .view-section.active { display: block; }
+        .overlay-mask { transition: opacity 0.3s ease; opacity: 0; pointer-events: none; backdrop-filter: blur(0px); z-index: 200; }
+        .overlay-mask.open { opacity: 1; pointer-events: auto; backdrop-filter: blur(8px); }
+        #sidebar { transition: transform 0.3s ease; z-index: 150; }
+        @media (max-width: 1024px) {
+            #sidebar { transform: translateX(-100%); position: fixed; height: 100vh; }
+            #sidebar.open { transform: translateX(0); }
+        }
+        @media (min-width: 1025px) {
+            #sidebar { position: static; transform: none; height: 100vh; }
+        }
+        .chat-bg-pattern { background-color: #EFEAE2; background-image: url('https://w0.peakpx.com/wallpaper/818/148/HD-wallpaper-whatsapp-background-cool-dark-green-light-pattern-patterns-texture-textures-white.jpg'); background-size: cover; background-blend-mode: multiply; }
+        .wa-bubble-sent { background-color: #D9FDD3; color: #111B21; border-radius: 12px 0px 12px 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .wa-bubble-received { background-color: #FFFFFF; color: #111B21; border-radius: 0px 12px 12px 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .wa-bubble-sent p, .wa-bubble-received p { color: #111B21 !important; }
+        .wa-bubble-sent .text-\[10px\], .wa-bubble-received .text-\[10px\] { color: #667781 !important; }
+    </style>
+</head>
+<body class="h-screen flex flex-col md:flex-row text-sm">
+
+    <div class="ambient-bg"></div>
+    <div id="sidebarMask" onclick="window.toggleSidebar()" class="overlay-mask fixed inset-0 w-full h-full bg-black/80 z-[140] lg:hidden"></div>
+
+    <div id="securityGate" class="fixed inset-0 w-full h-full z-[300] bg-[#03040B] flex flex-col items-center justify-center transition-opacity duration-500 px-6 text-center">
+        <i class="fa-solid fa-shield-halved text-5xl text-brand-gold mb-6 animate-pulse"></i>
+        <h2 class="text-base sm:text-xl md:text-2xl font-display font-black text-white tracking-widest uppercase leading-snug">Verifying Vendor Clearance...</h2>
+        <p class="text-[10px] text-gray-500 uppercase tracking-widest mt-3 font-mono">Secured by ViraForce</p>
+    </div>
+
+    <!-- Modals -->
+    <div id="customAlertModal" class="overlay-mask fixed inset-0 flex items-center justify-center p-4 z-[400]">
+        <div class="glass-panel p-8 rounded-3xl w-full max-w-sm transform scale-95 transition-all duration-300 relative border-brand-gold/30" id="customAlertBox">
+            <div class="w-14 h-14 rounded-full bg-brand-gold/10 flex items-center justify-center mb-6 border border-brand-gold/30 shadow-[0_0_15px_rgba(245,192,0,0.3)]">
+                <i class="fa-solid fa-bell text-2xl text-brand-gold"></i>
+            </div>
+            <h3 id="alertTitle" class="text-xl font-display font-black text-white mb-2">Notification</h3>
+            <p id="alertMessage" class="text-sm text-gray-400 mb-8 leading-relaxed"></p>
+            <button onclick="window.closeAlert()" class="w-full bg-brand-gold text-black font-bold py-3 rounded-xl uppercase tracking-widest">Acknowledge</button>
+        </div>
+    </div>
+
+    <div id="customConfirmModal" class="overlay-mask fixed inset-0 flex items-center justify-center p-4 z-[400]">
+        <div class="glass-panel p-8 rounded-3xl w-full max-w-sm transform scale-95 transition-all duration-300 relative border-brand-accent/30" id="customConfirmBox">
+            <div class="w-14 h-14 rounded-full bg-brand-accent/10 flex items-center justify-center mb-6 border border-brand-accent/30 shadow-[0_0_15px_rgba(0,229,255,0.3)]">
+                <i class="fa-solid fa-triangle-exclamation text-2xl text-brand-accent"></i>
+            </div>
+            <h3 id="confirmTitle" class="text-xl font-display font-black text-white mb-2">Confirm</h3>
+            <p id="confirmMessage" class="text-sm text-gray-400 mb-8 leading-relaxed"></p>
+            <div class="flex gap-3 justify-end">
+                <button id="confirmCancel" class="px-6 py-3 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-white/5">Cancel</button>
+                <button id="confirmAccept" class="bg-brand-accent text-black font-bold px-6 py-3 rounded-xl uppercase tracking-widest">Proceed</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deliverable / Vault Modal -->
+    <div id="vendorDeliverableModal" class="overlay-mask fixed inset-0 flex items-center justify-center p-4 z-[280]">
+        <div class="glass-panel p-6 sm:p-8 rounded-3xl w-full max-w-lg transform transition-all duration-300 relative border-brand-purple/40 max-h-[92vh] overflow-y-auto custom-scrollbar">
+            <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-4">
+                <h3 class="text-xl font-black text-white flex items-center gap-2"><i class="fa-solid fa-vault text-brand-purple"></i> Product Deliverable Vault</h3>
+                <button onclick="window.closeModals()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <p class="text-xs text-gray-400 mb-6" id="vdmProductTitle">Configure instant delivery payload for this product.</p>
+
+            <form onsubmit="window.saveVaultDeliverable(event)" class="space-y-6">
+                <input type="hidden" id="vdmListingDocId">
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Deliverable Category</label>
+                    <select id="vdmInputCategory" onchange="window.handleVaultCategoryChange()" class="admin-input w-full px-4 py-3 rounded-xl text-sm font-bold text-brand-purple">
+                        <option value="text">Text Input (Password, Gmail, Phone, Custom)</option>
+                        <option value="document">Document File (PDF, VCF, DOCX, XLSX, TXT, ZIP, etc.)</option>
+                        <option value="image">Image Asset (JPG, PNG, WebP)</option>
+                        <option value="url">URL Link (Google Drive, Web App, Portal)</option>
+                    </select>
+                </div>
+
+                <!-- Text Deliverable Panel -->
+                <div id="vdmTextPanel" class="space-y-4">
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Data Type</label>
+                        <select id="vdmTextType" onchange="window.handleVaultTextTypeChange()" class="admin-input w-full px-4 py-3 rounded-xl text-xs">
+                            <option value="Password">Password / Secret Key</option>
+                            <option value="Gmail">Gmail / Email Credentials</option>
+                            <option value="Phone number">Phone Number / WhatsApp Contact</option>
+                            <option value="Custom name">Custom Name / Tag</option>
+                        </select>
+                    </div>
+                    <div id="vdmCustomNameRow" class="hidden">
+                        <label class="block text-[10px] font-bold text-brand-gold uppercase tracking-widest mb-2">Custom Type Name</label>
+                        <input type="text" id="vdmCustomTypeName" oninput="window.autoSaveCustomTypeName()" class="admin-input w-full px-4 py-3 rounded-xl text-xs" placeholder="e.g. License Activation Key">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Deliverable Content / Credentials</label>
+                        <textarea id="vdmTextContent" class="admin-input w-full p-4 rounded-xl text-xs h-28 resize-none" placeholder="Enter credentials, access tokens, or instructions..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Document Deliverable Panel -->
+                <div id="vdmDocPanel" class="space-y-4 hidden">
+                    <p class="text-[10px] text-gray-400">Supported formats: PDF, VCF, DOC, DOCX, XLS, XLSX, CSV, PPT, PPTX, TXT, ZIP, RAR, JSON, XML.</p>
+                    <label class="border-2 border-dashed border-brand-purple/40 hover:border-brand-purple rounded-2xl p-6 flex flex-col items-center justify-center cursor-pointer transition-all bg-brand-purple/5">
+                        <i class="fa-solid fa-file-arrow-up text-3xl text-brand-purple mb-2"></i>
+                        <span class="text-xs font-bold text-white" id="vdmDocFileLabel">Choose Document from Device</span>
+                        <input type="file" id="vdmDocFileInput" accept=".pdf,.vcf,.doc,.docx,.xls,.xlsx,.csv,.ppt,.pptx,.txt,.zip,.rar,.json,.xml" class="hidden" onchange="window.handleVaultDocSelect(event)">
+                    </label>
+                    <div id="vdmDocPreview" class="hidden p-3 bg-black/40 rounded-xl border border-white/10 flex items-center justify-between text-xs">
+                        <span id="vdmDocName" class="truncate font-mono">File selected</span>
+                        <button type="button" onclick="window.clearVaultDoc()" class="text-brand-pink"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                </div>
+
+                <!-- Image Deliverable Panel -->
+                <div id="vdmImagePanel" class="space-y-4 hidden">
+                    <label class="border-2 border-dashed border-brand-accent/40 hover:border-brand-accent rounded-2xl p-6 flex flex-col items-center justify-center cursor-pointer transition-all bg-brand-accent/5">
+                        <i class="fa-solid fa-image text-3xl text-brand-accent mb-2"></i>
+                        <span class="text-xs font-bold text-white" id="vdmImageFileLabel">Choose Image from Device</span>
+                        <input type="file" id="vdmImageFileInput" accept="image/*" class="hidden" onchange="window.handleVaultImageSelect(event)">
+                    </label>
+                    <div id="vdmImagePreviewContainer" class="hidden text-center">
+                        <img id="vdmImagePreview" src="" class="h-24 mx-auto rounded-xl border border-white/10 object-cover mb-2">
+                        <button type="button" onclick="window.clearVaultImage()" class="text-xs text-brand-pink font-bold"><i class="fa-solid fa-trash mr-1"></i> Remove Image</button>
+                    </div>
+                </div>
+
+                <!-- URL Deliverable Panel -->
+                <div id="vdmUrlPanel" class="space-y-4 hidden">
+                    <label class="block text-[10px] font-bold text-brand-accent uppercase tracking-widest mb-2">External Link / Storage URL</label>
+                    <input type="url" id="vdmUrlInput" class="admin-input w-full px-4 py-3 rounded-xl text-xs text-brand-accent" placeholder="https://drive.google.com/... or https://...">
+                </div>
+
+                <!-- Product Reference Image (Optional) -->
+                <div class="border-t border-white/10 pt-4">
+                    <label class="block text-[10px] font-bold text-brand-gold uppercase tracking-widest mb-2">Product Reference Image</label>
+                    <div class="flex gap-3 items-center">
+                        <input type="text" id="vdmRefImageUrl" class="admin-input w-full px-4 py-2.5 rounded-xl text-xs flex-1" placeholder="URL or select local image">
+                        <label class="bg-white/10 border border-white/10 px-3 py-2.5 rounded-xl text-xs font-bold cursor-pointer hover:bg-white/20 whitespace-nowrap">
+                            <i class="fa-solid fa-camera"></i>
+                            <input type="file" id="vdmRefImageFile" accept="image/*" class="hidden" onchange="window.handleVaultRefImageSelect(event)">
+                        </label>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 justify-end pt-4 border-t border-white/10">
+                    <button type="button" onclick="window.closeModals()" class="px-6 py-3 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-white/5">Cancel</button>
+                    <button type="submit" id="vdmSaveBtn" class="bg-brand-purple text-white px-8 py-3 rounded-xl text-xs font-bold uppercase tracking-widest shadow-[0_0_15px_rgba(168,85,247,0.4)] hover:bg-white hover:text-black transition-all">Save Vault Deliverable</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dispute Appeal Modal -->
+    <div id="vendorAppealModal" class="overlay-mask fixed inset-0 flex items-center justify-center p-4 z-[280]">
+        <div class="glass-panel p-6 sm:p-8 rounded-3xl w-full max-w-md transform transition-all duration-300 relative border-brand-pink/40 shadow-neon-pink">
+            <h3 class="text-xl font-black text-white mb-2 flex items-center gap-2"><i class="fa-solid fa-gavel text-brand-pink"></i> Dispute Appeal & WhatsApp Bridge</h3>
+            <p class="text-xs text-gray-400 mb-6">Submit your formal appeal to Super Admin Arbitration and automatically connect with support via WhatsApp with prefilled case evidence.</p>
+
+            <form onsubmit="window.executeDisputeAppeal(event)" class="space-y-4">
+                <input type="hidden" id="vapReportId">
+                <input type="hidden" id="vapOrderId">
+                <input type="hidden" id="vapProductTitle">
+                <input type="hidden" id="vapBuyerId">
+
+                <div class="bg-black/50 p-3 rounded-xl border border-white/5 text-xs space-y-1">
+                    <p class="text-gray-400">Case ID: <span id="vapDisplayReportId" class="text-brand-accent font-mono"></span></p>
+                    <p class="text-gray-400">Product: <span id="vapDisplayProduct" class="text-brand-gold font-bold"></span></p>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Vendor Appeal Statement</label>
+                    <textarea id="vapAppealNotes" class="admin-input w-full p-4 rounded-xl text-xs h-32 resize-none" placeholder="Provide proof of fulfillment, delivery links, or rebuttal..." required></textarea>
+                </div>
+
+                <div class="flex gap-3 justify-end pt-2">
+                    <button type="button" onclick="window.closeModals()" class="px-5 py-3 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-white/5">Cancel</button>
+                    <button type="submit" class="bg-[#25D366] text-black font-bold px-6 py-3 rounded-xl text-xs uppercase tracking-widest hover:bg-white transition-all shadow-[0_0_15px_rgba(37,211,102,0.4)] flex items-center gap-2">
+                        <i class="fa-brands fa-whatsapp text-sm"></i> Submit & Appeal
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Other Modals -->
+    <div id="requestBankModal" class="overlay-mask fixed inset-0 flex items-center justify-center p-4 z-[250]">
+        <div class="glass-panel p-8 rounded-3xl w-full max-w-md transform transition-all duration-300 relative border-brand-accent/30">
+            <h3 class="text-xl font-display font-black text-white mb-2">Request Bank Addition</h3>
+            <p class="text-sm text-gray-400 mb-6">If your bank is not in the directory, enter it below. The Super Admin will verify and add it.</p>
+            <form onsubmit="window.submitBankRequest(event)">
+                <input type="text" id="reqBankName" class="admin-input w-full p-4 rounded-xl text-sm mb-6" placeholder="Enter Full Bank Name" required>
+                <div class="flex gap-3 justify-end">
+                    <button type="button" onclick="window.closeModals()" class="px-6 py-3 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-white/5">Cancel</button>
+                    <button type="submit" class="bg-brand-accent text-black px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-white transition-all">Submit Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="withdrawalModal" class="overlay-mask fixed inset-0 flex items-center justify-center p-4 z-[250]">
+        <div class="glass-panel p-6 sm:p-8 rounded-3xl w-full max-w-md transform transition-all duration-300 relative border-brand-emerald/40 shadow-[0_0_40px_rgba(0,255,157,0.1)]">
+            <h3 class="text-2xl font-black text-white mb-1"><i class="fa-solid fa-money-bill-transfer text-brand-emerald mr-2"></i> Execute Payout</h3>
+            <p class="text-[10px] text-gray-400 uppercase tracking-widest mb-6 border-b border-white/10 pb-4">Standard 18% Fee Structure Applied</p>
+
+            <div class="space-y-3 mb-6 font-mono text-sm">
+                <div class="flex justify-between items-center text-gray-300">
+                    <span>Gross Cleared Balance:</span>
+                    <span id="wdGross" class="font-bold text-white">₦0</span>
+                </div>
+                <div class="flex justify-between items-center text-brand-pink text-xs">
+                    <span>System Sales Fee (10%):</span>
+                    <span id="wdMaint">-₦0</span>
+                </div>
+                <div class="flex justify-between items-center text-brand-pink text-xs">
+                    <span>VAT (5%):</span>
+                    <span id="wdTax">-₦0</span>
+                </div>
+                <div class="flex justify-between items-center text-brand-pink text-xs">
+                    <span>Withdrawal Fee (2%):</span>
+                    <span id="wdProc">-₦0</span>
+                </div>
+                <div class="flex justify-between items-center text-brand-pink text-xs">
+                    <span>Escrow Security (1%):</span>
+                    <span id="wdEscrow">-₦0</span>
+                </div>
+                <div class="border-t border-white/10 pt-3 flex justify-between items-center">
+                    <span class="text-gray-400 font-sans text-xs uppercase tracking-widest font-bold">Net Payout to Bank:</span>
+                    <span id="wdNet" class="text-xl font-black text-brand-emerald">₦0</span>
+                </div>
+            </div>
+
+            <div class="bg-black/50 p-4 rounded-xl border border-white/5 mb-6">
+                <label class="block text-[10px] font-bold text-brand-gold uppercase tracking-widest mb-2">4-Digit Security PIN</label>
+                <input type="password" id="wdPin" maxlength="4" pattern="[0-9]{4}" class="admin-input w-full p-4 rounded-xl text-center text-2xl tracking-[1em] font-black font-mono text-brand-gold focus:border-brand-gold" placeholder="••••" required autocomplete="off">
+                <p class="text-[9px] text-gray-500 mt-2 text-center">Enter your secure withdrawal PIN to authorize this transfer.</p>
+            </div>
+
+            <div class="flex gap-3 justify-end">
+                <button onclick="window.closeModals()" class="px-6 py-3 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-white/5">Cancel</button>
+                <button onclick="window.processFinalWithdrawal()" class="bg-brand-emerald text-black px-8 py-3 rounded-xl text-xs font-bold uppercase tracking-widest shadow-[0_0_15px_rgba(0,255,157,0.4)] hover:bg-white transition-all">Authorize Payout</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="v3DeliveryModal" class="overlay-mask fixed inset-0 flex items-center justify-center p-4 z-[250]">
+        <div class="glass-panel p-8 rounded-3xl w-full max-w-md transform transition-all duration-300 relative border-yellow-500/40 shadow-[0_0_40px_rgba(234,179,8,0.1)]">
+            <div class="w-14 h-14 rounded-full bg-yellow-500/10 flex items-center justify-center mb-6 border border-yellow-500/30">
+                <i class="fa-solid fa-truck-fast text-2xl text-yellow-500 animate-pulse"></i>
+            </div>
+            <h3 class="text-xl font-black text-white mb-2">Confirm Physical Dispatch</h3>
+            <p class="text-sm text-gray-400 mb-4 leading-relaxed">You are marking this order as Delivered. <strong class="text-brand-pink">Warning: Fraudulent delivery claims trigger instant account restriction.</strong></p>
+
+            <div class="bg-brand-800/80 p-4 rounded-xl border border-white/5 mb-6">
+                <label class="flex items-start gap-3 cursor-pointer">
+                    <input type="checkbox" id="v3DispatchCheck" class="mt-1 w-4 h-4 rounded border-white/20 bg-black/50 text-yellow-500 focus:ring-yellow-500 focus:ring-offset-0">
+                    <span class="text-xs text-gray-300 leading-relaxed">I declare I have successfully dispatched the exact product to the buyer. I accept the risks of false claims.</span>
+                </label>
+            </div>
+            <div class="flex gap-3 justify-end">
+                <button onclick="window.closeModals()" class="px-6 py-3 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-white/5">Cancel</button>
+                <button onclick="window.executeV3Delivery()" class="bg-yellow-500 text-black px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-white transition-all">Dispatch Item</button>
+            </div>
+            <input type="hidden" id="v3OrderId">
+        </div>
+    </div>
+
+    <div id="v2DeliveryModal" class="overlay-mask fixed inset-0 flex items-center justify-center p-4 z-[250]">
+        <div class="glass-panel p-8 rounded-3xl w-full max-w-md transform transition-all duration-300 relative border-brand-accent/40 shadow-[0_0_40px_rgba(0,229,255,0.1)]">
+            <h3 class="text-xl font-black text-white mb-2"><i class="fa-solid fa-cloud-arrow-up text-brand-accent mr-2"></i> Release Deliverable</h3>
+            <p class="text-xs text-gray-400 mb-6">Provide the link, access code, or final text to release the order. The deliverable enters buyer vault immediately.</p>
+
+            <div class="space-y-4 mb-6">
+                <div>
+                    <label class="block text-[10px] font-bold text-brand-accent uppercase tracking-widest mb-2">Delivery Data (Link/Text/Credentials)</label>
+                    <textarea id="v2DeliveryPayload" class="admin-input w-full p-4 rounded-xl text-sm h-32 resize-none" placeholder="https://drive.google.com/...&#10;OR&#10;Username: user&#10;Password: pass" required></textarea>
+                </div>
+            </div>
+
+            <div class="flex gap-3 justify-end">
+                <button onclick="window.closeModals()" class="px-6 py-3 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-white/5">Cancel</button>
+                <button onclick="window.executeV2Delivery()" class="bg-brand-accent text-black px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest shadow-[0_0_15px_rgba(0,229,255,0.4)] hover:bg-white transition-all">Release to Buyer Vault</button>
+            </div>
+            <input type="hidden" id="v2OrderId">
+        </div>
+    </div>
+
+    <div id="buyerProfileModal" class="overlay-mask fixed inset-0 flex items-center justify-center p-4 z-[250]">
+        <div class="glass-panel p-8 rounded-3xl w-full max-w-md transform transition-all duration-300 relative border-white/10 text-center max-h-[90vh] overflow-y-auto custom-scrollbar">
+            <button onclick="window.closeModals()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <img id="bpAvatar" src="images/logo.png" class="w-24 h-24 rounded-full mx-auto border-4 border-brand-800 shadow-[0_0_20px_rgba(0,240,255,0.2)] object-cover mb-4">
+            <h3 id="bpName" class="text-xl font-black text-white mb-1">Buyer Name</h3>
+            <p class="text-[10px] text-brand-emerald uppercase tracking-widest font-bold mb-6 bg-brand-emerald/10 inline-block px-3 py-1 rounded-full border border-brand-emerald/20" id="bpStatus">Active Customer</p>
+
+            <div class="bg-black/40 p-3 rounded-xl border border-white/5 flex items-center justify-between text-left mt-2 mb-4">
+                <div>
+                    <p class="text-[9px] text-gray-500 uppercase font-bold tracking-widest mb-0.5">Contact Email</p>
+                    <p class="text-xs text-white font-mono" id="bpEmail">Hidden</p>
+                </div>
+            </div>
+
+            <div id="bpListingsArea" class="hidden text-left border-t border-white/10 pt-4 mt-2">
+                <h4 class="text-[10px] uppercase text-gray-400 font-bold mb-3 flex items-center gap-2"><i class="fa-solid fa-layer-group"></i> User Listings</h4>
+                <div id="bpListingsGrid" class="space-y-3 max-h-48 overflow-y-auto custom-scrollbar pr-2"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         SIDEBAR NAVIGATION
+    =========================================== -->
+    <aside id="sidebar" class="bg-[#050810]/95 backdrop-blur-2xl border-r border-white/5 flex flex-col flex-shrink-0 w-64 z-50">
+        <div class="h-20 border-b border-white/5 flex items-center justify-between px-6">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="window.location.href='index.html'">
+                <div class="w-10 h-10 rounded-xl bg-brand-gold/10 border border-brand-gold/30 flex items-center justify-center text-brand-gold shadow-[0_0_15px_rgba(245,192,0,0.2)]">
+                    <i class="fa-solid fa-store text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="font-display font-black text-white text-base tracking-tight leading-none">VIRAFORCE</h1>
+                    <span class="text-[9px] font-bold text-brand-gold uppercase tracking-[0.2em] mt-1 block">Seller Central</span>
+                </div>
+            </div>
+            <button onclick="window.toggleSidebar()" class="lg:hidden text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <nav class="flex-1 py-6 flex flex-col gap-1.5 overflow-y-auto px-4 custom-scrollbar">
+            <a href="index.html" class="flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-black bg-gradient-to-r from-brand-gold to-yellow-500 hover:to-brand-gold mb-6 shadow-[0_4px_15px_rgba(245,192,0,0.3)] transition-all text-xs uppercase tracking-widest">
+                <i class="fa-solid fa-arrow-left-long"></i> Hub Market
+            </a>
+
+            <p class="px-4 text-[9px] font-bold text-gray-500 uppercase tracking-[0.2em] mb-2 font-display">Merchant Operations</p>
+            <button onclick="window.switchTab('dashboard')" id="tab-dashboard" class="tab-btn active text-left px-4 py-3 text-xs font-bold text-gray-300 flex items-center gap-3 w-full">
+                <i class="fa-solid fa-chart-pie w-5 text-center text-brand-gold"></i> Overview & Metrics
+            </button>
+            <button onclick="window.switchTab('listings')" id="tab-listings" class="tab-btn text-left px-4 py-3 text-xs font-bold text-gray-300 flex items-center gap-3 w-full">
+                <i class="fa-solid fa-boxes-stacked w-5 text-center text-brand-purple"></i> Product Deliverables & Vault
+            </button>
+            <button onclick="window.switchTab('orders')" id="tab-orders" class="tab-btn text-left px-4 py-3 text-xs font-bold text-gray-300 flex items-center gap-3 w-full">
+                <i class="fa-solid fa-dolly w-5 text-center text-brand-accent"></i> Customer Orders
+            </button>
+            <button onclick="window.switchTab('withdrawals')" id="tab-withdrawals" class="tab-btn text-left px-4 py-3 text-xs font-bold text-gray-300 flex items-center gap-3 w-full">
+                <i class="fa-solid fa-vault w-5 text-center text-brand-emerald"></i> Financial Ledger & Payouts
+            </button>
+
+            <p class="px-4 text-[9px] font-bold text-gray-500 uppercase tracking-[0.2em] mb-2 mt-6 font-display">Communication & Claims</p>
+            <button onclick="window.switchTab('reports')" id="tab-reports" class="tab-btn text-left px-4 py-3 text-xs font-bold text-gray-300 flex items-center gap-3 w-full">
+                <i class="fa-solid fa-shield-halved w-5 text-center text-brand-pink"></i> Dispute Claims & Appeals
+            </button>
+            <button onclick="window.switchTab('chats')" id="tab-chats" class="tab-btn text-left px-4 py-3 text-xs font-bold text-gray-300 flex items-center gap-3 w-full">
+                <i class="fa-solid fa-comments w-5 text-center text-green-400"></i> Direct Client Comms
+            </button>
+        </nav>
+
+        <div class="p-4 border-t border-white/5">
+            <div class="bg-black/50 p-3 rounded-xl border border-white/5 flex items-center gap-3">
+                <img id="vendorNavAvatar" src="images/logo.png" class="w-9 h-9 rounded-lg object-cover border border-white/10">
+                <div class="min-w-0 flex-1">
+                    <p id="vendorNavName" class="text-xs font-bold text-white truncate">Vendor</p>
+                    <span class="text-[9px] font-bold text-brand-gold uppercase tracking-widest block font-mono">Verified Seller</span>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ==========================================
+         MAIN VIEWPORT
+    =========================================== -->
+    <main class="flex-1 overflow-y-auto relative flex flex-col h-full custom-scrollbar bg-[#03040B]">
+        <!-- Header -->
+        <header class="h-20 border-b border-white/5 bg-[#050810]/70 backdrop-blur-2xl flex items-center justify-between px-6 lg:px-10 sticky top-0 z-30">
+            <div class="flex items-center gap-4">
+                <button onclick="window.toggleSidebar()" class="lg:hidden w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white border border-white/10">
+                    <i class="fa-solid fa-bars-staggered"></i>
+                </button>
+                <div>
+                    <h2 id="pageTitle" class="font-display font-black text-xl text-white tracking-tight">Overview & Metrics</h2>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <button onclick="window.refreshAllData()" class="bg-white/5 hover:bg-white/10 text-white font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-2 border border-white/10 transition-colors uppercase tracking-widest">
+                    <i class="fa-solid fa-rotate text-brand-gold" id="refreshIcon"></i> Sync
+                </button>
+                <button onclick="window.openWithdrawalModal()" class="bg-brand-emerald text-black font-black px-5 py-2.5 rounded-xl text-xs uppercase tracking-widest shadow-[0_0_15px_rgba(0,255,157,0.3)] hover:bg-white transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-money-bill-transfer"></i> Payout
+                </button>
+            </div>
+        </header>
+
+        <!-- Dynamic Content Body -->
+        <div class="p-6 lg:p-10 space-y-8 flex-1">
+            
+            <!-- Financial Summary Cards (Sticky Across Top) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="glass-panel p-5 rounded-2xl border-brand-gold/20 flex flex-col justify-between relative overflow-hidden">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-[9px] font-bold text-gray-400 uppercase tracking-widest font-mono">Cleared (Withdrawable)</span>
+                        <div class="w-8 h-8 rounded-lg bg-brand-emerald/10 text-brand-emerald flex items-center justify-center text-sm border border-brand-emerald/20"><i class="fa-solid fa-wallet"></i></div>
+                    </div>
+                    <p class="text-2xl font-black text-brand-emerald font-mono" id="statWithdrawable">₦0</p>
+                    <p class="text-[10px] text-gray-500 mt-2 font-medium">Ready for immediate bank settlement.</p>
+                </div>
+
+                <div class="glass-panel p-5 rounded-2xl border-white/10 flex flex-col justify-between relative overflow-hidden">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-[9px] font-bold text-gray-400 uppercase tracking-widest font-mono">Processing (Escrow/Dispatch)</span>
+                        <div class="w-8 h-8 rounded-lg bg-yellow-500/10 text-yellow-500 flex items-center justify-center text-sm border border-yellow-500/20"><i class="fa-solid fa-hourglass-half"></i></div>
+                    </div>
+                    <p class="text-2xl font-black text-yellow-500 font-mono" id="statProcessing">₦0</p>
+                    <p class="text-[10px] text-gray-500 mt-2 font-medium">Dispatched orders awaiting buyer confirmation.</p>
+                </div>
+
+                <div class="glass-panel p-5 rounded-2xl border-white/10 flex flex-col justify-between relative overflow-hidden">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-[9px] font-bold text-gray-400 uppercase tracking-widest font-mono">Total Earned Lifetime</span>
+                        <div class="w-8 h-8 rounded-lg bg-brand-accent/10 text-brand-accent flex items-center justify-center text-sm border border-brand-accent/20"><i class="fa-solid fa-chart-line"></i></div>
+                    </div>
+                    <p class="text-2xl font-black text-brand-accent font-mono" id="statEarned">₦0</p>
+                    <p class="text-[10px] text-gray-500 mt-2 font-medium">Cumulative completed marketplace settlements.</p>
+                </div>
+
+                <div class="glass-panel p-5 rounded-2xl border-white/10 flex flex-col justify-between relative overflow-hidden">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-[9px] font-bold text-gray-400 uppercase tracking-widest font-mono">Dispute / Pending Claims</span>
+                        <div class="w-8 h-8 rounded-lg bg-brand-pink/10 text-brand-pink flex items-center justify-center text-sm border border-brand-pink/20"><i class="fa-solid fa-gavel"></i></div>
+                    </div>
+                    <p class="text-2xl font-black text-brand-pink font-mono" id="statDisputes">0</p>
+                    <p class="text-[10px] text-gray-500 mt-2 font-medium">Active customer reports under arbitration.</p>
+                </div>
+            </div>
+
+            <!-- VIEW: DASHBOARD / OVERVIEW -->
+            <section id="view-dashboard" class="view-section active animate-fade-in-up space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 glass-panel p-6 sm:p-8 rounded-3xl border-white/10">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-lg font-bold text-white flex items-center gap-2"><i class="fa-solid fa-bell text-brand-gold"></i> Live Activity & Notifications</h3>
+                            <span class="text-[10px] text-gray-500 uppercase tracking-widest font-mono">Real-time Stream</span>
+                        </div>
+                        <div id="vendorNotificationsList" class="space-y-3">
+                            <div class="p-8 text-center text-gray-500 text-xs font-mono">Listening for transaction events...</div>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-6 sm:p-8 rounded-3xl border-white/10 flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-lg font-bold text-white mb-2 flex items-center gap-2"><i class="fa-solid fa-building-columns text-brand-accent"></i> Settlement Account</h3>
+                            <p class="text-xs text-gray-400 mb-6">Bank details registered for automated 18% fee disbursements.</p>
+                            <div class="bg-black/50 p-4 rounded-2xl border border-white/5 space-y-2 font-mono text-xs mb-6">
+                                <div class="flex justify-between"><span class="text-gray-500">Bank:</span><span id="vbBankName" class="text-white font-bold">Checking...</span></div>
+                                <div class="flex justify-between"><span class="text-gray-500">Account #:</span><span id="vbAccountNo" class="text-white font-bold">••••••••</span></div>
+                                <div class="flex justify-between"><span class="text-gray-500">Holder:</span><span id="vbAccountName" class="text-brand-gold font-bold">Vendor Entity</span></div>
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <button onclick="document.getElementById('requestBankModal').classList.add('open')" class="w-full bg-white/5 hover:bg-white/10 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-widest border border-white/10 transition-colors">
+                                <i class="fa-solid fa-plus mr-1"></i> Request Bank Addition
+                            </button>
+                            <button onclick="window.openWithdrawalModal()" class="w-full bg-brand-emerald text-black font-black py-3 rounded-xl text-xs uppercase tracking-widest shadow-[0_0_15px_rgba(0,255,157,0.3)] hover:bg-white transition-all">
+                                Withdraw Funds
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW: LISTINGS / PRODUCTS DELIVERABLE VAULT -->
+            <section id="view-listings" class="view-section animate-fade-in-up space-y-6">
+                <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+                    <div>
+                        <h3 class="text-2xl font-black text-white tracking-tight">Product Deliverables & Vault Management</h3>
+                        <p class="text-xs text-gray-400 mt-1">Configure automated digital credentials, URLs, documents, and reference payloads for instant delivery upon customer acquisition.</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <input type="text" id="listingSearchInput" oninput="window.filterVendorListings()" placeholder="Filter products or PID..." class="admin-input px-4 py-2.5 rounded-xl text-xs w-64">
+                    </div>
+                </div>
+
+                <div id="vendorListingsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="col-span-full text-center py-20 text-gray-500 text-xs font-mono"><i class="fa-solid fa-circle-notch fa-spin text-2xl text-brand-purple mb-2"></i><br>Scanning catalog...</div>
+                </div>
+            </section>
+
+            <!-- VIEW: ORDERS FULFILLMENT -->
+            <section id="view-orders" class="view-section animate-fade-in-up space-y-6">
+                <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+                    <div>
+                        <h3 class="text-2xl font-black text-white tracking-tight">Customer Orders & Fulfillment Engine</h3>
+                        <p class="text-xs text-gray-400 mt-1">Manage physical deliveries (V3) and manual service releases (V2). Funds move to processing balance immediately on dispatch.</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <select id="orderStatusFilter" onchange="window.filterVendorOrders()" class="admin-input px-4 py-2.5 rounded-xl text-xs font-bold text-brand-gold">
+                            <option value="ALL">All Orders</option>
+                            <option value="PROCESSING">Pending Dispatch</option>
+                            <option value="DELIVERED">Dispatched / Released</option>
+                            <option value="RECEIVED">Confirmed Received</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="vendorOrdersList" class="space-y-4">
+                    <div class="p-16 text-center text-gray-500 text-xs font-mono"><i class="fa-solid fa-circle-notch fa-spin text-2xl text-brand-accent mb-2"></i><br>Syncing order books...</div>
+                </div>
+            </section>
+
+            <!-- VIEW: FINANCIAL LEDGER & PAYOUTS -->
+            <section id="view-withdrawals" class="view-section animate-fade-in-up space-y-6">
+                <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+                    <div>
+                        <h3 class="text-2xl font-black text-white tracking-tight">Real-Time Payout Ledger</h3>
+                        <p class="text-xs text-gray-400 mt-1">Track 3-stage payout status lifecycle (Pending &rarr; Processing &rarr; Completed) matching Super Admin settlements.</p>
+                    </div>
+                    <button onclick="window.openWithdrawalModal()" class="bg-brand-emerald text-black font-black px-6 py-3 rounded-xl text-xs uppercase tracking-widest shadow-[0_0_15px_rgba(0,255,157,0.3)] hover:bg-white transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-money-bill-transfer"></i> Request Withdrawal
+                    </button>
+                </div>
+
+                <div class="glass-panel rounded-3xl border-white/10 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs font-mono">
+                            <thead class="bg-black/60 border-b border-white/10 text-gray-400 uppercase tracking-widest text-[10px]">
+                                <tr>
+                                    <th class="p-4">Reference / ID</th>
+                                    <th class="p-4">Date</th>
+                                    <th class="p-4">Gross Balance</th>
+                                    <th class="p-4">18% Fees</th>
+                                    <th class="p-4">Net Payout</th>
+                                    <th class="p-4">Status & Stage</th>
+                                </tr>
+                            </thead>
+                            <tbody id="vendorPayoutsTable" class="divide-y divide-white/5 text-gray-200">
+                                <tr><td colspan="6" class="p-10 text-center text-gray-500">Connecting to payout ledger...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW: DISPUTE CLAIMS & APPEALS -->
+            <section id="view-reports" class="view-section animate-fade-in-up space-y-6">
+                <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+                    <div>
+                        <h3 class="text-2xl font-black text-white tracking-tight">Customer Dispute Claims & Arbitration Appeals</h3>
+                        <p class="text-xs text-gray-400 mt-1">Review customer reports. Submit counter-evidence and launch the formal WhatsApp arbitration bridge directly to Super Admin.</p>
+                    </div>
+                </div>
+
+                <div id="vendorReportsList" class="space-y-4">
+                    <div class="p-16 text-center text-gray-500 text-xs font-mono"><i class="fa-solid fa-circle-notch fa-spin text-2xl text-brand-pink mb-2"></i><br>Checking arbitration logs...</div>
+                </div>
+            </section>
+
+            <!-- VIEW: DIRECT CLIENT COMMS (WHATSAPP CLONE) -->
+            <section id="view-chats" class="view-section animate-fade-in-up">
+                <div class="glass-panel rounded-3xl border-white/10 overflow-hidden flex flex-col sm:flex-row h-[75vh]">
+                    <!-- Sidebar Contacts -->
+                    <div class="w-full sm:w-80 border-r border-white/10 flex flex-col bg-[#0A0D14]" id="chatListSidebar">
+                        <div class="p-4 border-b border-white/10">
+                            <input type="text" id="chatSearchInput" oninput="window.filterVendorChatContacts()" placeholder="Search buyer or order..." class="admin-input w-full px-4 py-2.5 rounded-xl text-xs">
+                        </div>
+                        <div id="chatContactsList" class="flex-1 overflow-y-auto custom-scrollbar divide-y divide-white/5">
+                            <div class="p-8 text-center text-gray-500 text-xs">Loading buyer threads...</div>
+                        </div>
+                    </div>
+
+                    <!-- Chat Window -->
+                    <div class="flex-1 flex flex-col chat-bg-pattern relative" id="activeChatArea">
+                        <div id="chatEmptyState" class="absolute inset-0 flex flex-col items-center justify-center p-8 bg-[#03040B]/90 z-10 text-center">
+                            <i class="fa-solid fa-comments text-5xl text-gray-600 mb-4"></i>
+                            <h4 class="text-lg font-bold text-white">Select a Buyer Thread</h4>
+                            <p class="text-xs text-gray-400 max-w-sm mt-1">Secure, encrypted communications linked to specific order fulfillment.</p>
+                        </div>
+
+                        <!-- Chat Header -->
+                        <div class="p-4 bg-[#0A0D14] border-b border-white/10 flex items-center justify-between z-20">
+                            <div class="flex items-center gap-3">
+                                <img id="chatHeaderAvatar" src="images/logo.png" class="w-10 h-10 rounded-full object-cover border border-white/20">
+                                <div>
+                                    <h5 id="chatHeaderTitle" class="font-bold text-white text-sm">Customer</h5>
+                                    <p id="chatHeaderProduct" class="text-[10px] text-brand-gold font-mono truncate max-w-xs">Product Thread</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button onclick="window.downloadVendorChatPDF()" class="w-9 h-9 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 flex items-center justify-center transition-colors" title="Export PDF Transcript"><i class="fa-solid fa-download text-xs"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- Messages Container -->
+                        <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar z-10"></div>
+
+                        <!-- Send Bar -->
+                        <form onsubmit="window.sendVendorChatMessage(event)" class="p-3 bg-[#0A0D14] border-t border-white/10 flex items-center gap-3 z-20">
+                            <input type="text" id="chatInput" placeholder="Type a response..." class="admin-input flex-1 px-4 py-3 rounded-xl text-xs" required>
+                            <button type="submit" class="bg-green-500 hover:bg-green-600 text-black font-bold px-5 py-3 rounded-xl text-xs uppercase tracking-wider flex items-center gap-2 transition-all">
+                                <i class="fa-solid fa-paper-plane"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- HIDDEN PDF GENERATION DOCK -->
+    <div id="pdfGenerationContainer" class="hidden absolute opacity-0 pointer-events-none -z-50"></div>
+
+    <!-- ==========================================
+         FIREBASE & SYSTEM ENGINE (V10)
+    =========================================== -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, query, where, orderBy, serverTimestamp, onSnapshot, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCefntIh-4jl9ku4lPEmnyEC4VoT_MXxFk",
+            authDomain: "vfa-product.firebaseapp.com",
+            projectId: "vfa-product",
+            storageBucket: "vfa-product.firebasestorage.app",
+            messagingSenderId: "245947400859",
+            appId: "1:245947400859:web:b92bf4ea3a8cbabc713c3e"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        window.currentUser = null;
+        window.vendorProfile = null;
+        window.allListings = [];
+        window.allOrders = [];
+        window.allPayouts = [];
+        window.allReports = [];
+        window.chatContacts = [];
+        window.currentChatId = null;
+        window.currentChatData = null;
+        window.chatUnsubscribe = null;
+
+        // Base64 Compressor
+        window.compressFileToBase64 = function(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        };
+
+        // --- AUTH & CLEARANCE GATE ---
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                window.currentUser = user;
+                try {
+                    const uDoc = await getDoc(doc(db, "users", user.uid));
+                    if (uDoc.exists()) {
+                        window.vendorProfile = { ...uDoc.data(), id: user.uid };
+                        
+                        // Update UI with vendor profile
+                        document.getElementById('vendorNavName').innerText = window.vendorProfile.displayName || user.email.split('@')[0];
+                        if (window.vendorProfile.avatar) {
+                            document.getElementById('vendorNavAvatar').src = window.vendorProfile.avatar;
+                        }
+
+                        // Populate Bank details
+                        if (window.vendorProfile.bankDetails) {
+                            document.getElementById('vbBankName').innerText = window.vendorProfile.bankDetails.bankName || "Configured";
+                            document.getElementById('vbAccountNo').innerText = window.vendorProfile.bankDetails.accountNumber || "••••••••";
+                            document.getElementById('vbAccountName').innerText = window.vendorProfile.bankDetails.accountName || window.vendorProfile.displayName;
+                        } else {
+                            document.getElementById('vbBankName').innerText = "Default Payout Bank";
+                            document.getElementById('vbAccountNo').innerText = "ViraForce Direct";
+                            document.getElementById('vbAccountName').innerText = window.vendorProfile.displayName || "Vendor";
+                        }
+
+                        window.updateBalanceCards();
+
+                        // Track Presence
+                        const updateOnline = () => { updateDoc(doc(db, "users", user.uid), { lastOnline: serverTimestamp() }).catch(()=>{}); };
+                        updateOnline();
+                        setInterval(updateOnline, 60000);
+
+                        // Unlock gate
+                        const gate = document.getElementById('securityGate');
+                        if (gate) {
+                            gate.style.opacity = '0';
+                            setTimeout(() => gate.style.display = 'none', 500);
+                        }
+
+                        window.initVendorListeners();
+                    } else {
+                        window.location.href = "index.html";
+                    }
+                } catch(e) {
+                    console.error("Vendor clearance error:", e);
+                    window.location.href = "index.html";
+                }
+            } else {
+                window.location.href = "index.html";
+            }
+        });
+
+        // --- NAVIGATION & TABS ---
+        window.toggleSidebar = function() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('sidebarMask').classList.toggle('open');
+        };
+
+        window.switchTab = function(tabId) {
+            document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+            const target = document.getElementById(`view-${tabId}`);
+            if (target) target.classList.add('active');
+            const btn = document.getElementById(`tab-${tabId}`);
+            if (btn) btn.classList.add('active');
+
+            const titles = {
+                'dashboard': 'Overview & Metrics',
+                'listings': 'Product Deliverables & Vault',
+                'orders': 'Customer Orders',
+                'withdrawals': 'Financial Ledger & Payouts',
+                'reports': 'Dispute Claims & Appeals',
+                'chats': 'Direct Client Comms'
+            };
+            document.getElementById('pageTitle').innerText = titles[tabId] || 'Seller Central';
+            if (window.innerWidth <= 1024) window.toggleSidebar();
+
+            if (tabId === 'chats') window.renderChatContacts();
+        };
+
+        window.closeModals = function() {
+            document.querySelectorAll('.overlay-mask').forEach(m => m.classList.remove('open'));
+        };
+
+        window.showAlert = function(title, msg) {
+            document.getElementById('alertTitle').innerText = title;
+            document.getElementById('alertMessage').innerText = msg;
+            document.getElementById('customAlertModal').classList.add('open');
+        };
+        window.closeAlert = function() {
+            document.getElementById('customAlertModal').classList.remove('open');
+        };
+
+        // --- REAL-TIME LISTENERS ---
+        window.initVendorListeners = function() {
+            if (!window.currentUser) return;
+            const uid = window.currentUser.uid;
+
+            // 1. User Balance & Profile Sync
+            onSnapshot(doc(db, "users", uid), (snap) => {
+                if (snap.exists()) {
+                    window.vendorProfile = { ...snap.data(), id: snap.id };
+                    window.updateBalanceCards();
+                }
+            });
+
+            // 2. Products / Listings
+            const qListings = query(collection(db, "listings"), where("vendorId", "==", uid));
+            onSnapshot(qListings, (snap) => {
+                window.allListings = [];
+                snap.forEach(d => window.allListings.push({ ...d.data(), id: d.id, listingId: d.data().listingId || d.id }));
+                window.renderVendorListings();
+            });
+
+            // 3. Orders
+            const qOrders = query(collection(db, "orders"), where("vendorId", "==", uid));
+            onSnapshot(qOrders, (snap) => {
+                window.allOrders = [];
+                snap.forEach(d => window.allOrders.push({ ...d.data(), id: d.id }));
+                window.renderVendorOrders();
+                window.initVendorChatThreads();
+            });
+
+            // 4. Real-time Payout Requests Sync with Admin
+            const qPayouts = query(collection(db, "payout_requests"), where("vendorId", "==", uid));
+            onSnapshot(qPayouts, (snap) => {
+                window.allPayouts = [];
+                snap.forEach(d => window.allPayouts.push({ ...d.data(), id: d.id }));
+                window.renderVendorPayouts();
+            });
+
+            // 5. Dispute Reports against this Vendor
+            const qReports = query(collection(db, "reports"), where("targetSeller", "==", uid));
+            onSnapshot(qReports, (snap) => {
+                window.allReports = [];
+                snap.forEach(d => window.allReports.push({ ...d.data(), id: d.id }));
+                window.renderVendorReports();
+            });
+
+            // 6. Vendor Notifications
+            const qNotifs = query(collection(db, "notifications"), where("userId", "==", uid));
+            onSnapshot(qNotifs, (snap) => {
+                const list = document.getElementById('vendorNotificationsList');
+                if (snap.empty) {
+                    list.innerHTML = `<div class="p-8 text-center text-gray-500 text-xs font-mono">No new transaction alerts.</div>`;
+                    return;
+                }
+                let notifs = [];
+                snap.forEach(d => notifs.push({ ...d.data(), id: d.id }));
+                notifs.sort((a,b) => (b.createdAt?.toMillis ? b.createdAt.toMillis() : 0) - (a.createdAt?.toMillis ? a.createdAt.toMillis() : 0));
+                
+                list.innerHTML = "";
+                notifs.slice(0, 10).forEach(n => {
+                    list.innerHTML += `
+                        <div class="p-3.5 bg-black/40 rounded-xl border border-white/5 flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-brand-gold/10 text-brand-gold flex items-center justify-center shrink-0 text-xs mt-0.5 border border-brand-gold/20">
+                                <i class="fa-solid fa-bell"></i>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <h6 class="text-xs font-bold text-white">${n.title || 'System Alert'}</h6>
+                                <p class="text-[11px] text-gray-400 mt-0.5 leading-relaxed">${n.summary || ''}</p>
+                            </div>
+                        </div>
+                    `;
+                });
+            });
+        };
+
+        window.updateBalanceCards = function() {
+            if (!window.vendorProfile) return;
+            const p = window.vendorProfile;
+            const withdrawable = Number(p.withdrawableBalance) || 0;
+            const processing = Number(p.processingBalance) || 0;
+            const earned = Number(p.totalEarned) || 0;
+
+            document.getElementById('statWithdrawable').innerText = "₦" + withdrawable.toLocaleString();
+            document.getElementById('statProcessing').innerText = "₦" + processing.toLocaleString();
+            document.getElementById('statEarned').innerText = "₦" + earned.toLocaleString();
+            document.getElementById('statDisputes').innerText = window.allReports.length;
+        };
+
+        window.refreshAllData = function() {
+            const icon = document.getElementById('refreshIcon');
+            if (icon) icon.classList.add('fa-spin');
+            window.updateBalanceCards();
+            window.renderVendorListings();
+            window.renderVendorOrders();
+            window.renderVendorPayouts();
+            window.renderVendorReports();
+            setTimeout(() => { if (icon) icon.classList.remove('fa-spin'); }, 600);
+        };
+
+        // --- PRODUCT DELIVERABLES & VAULT MANAGEMENT ---
+        window.tempVaultDoc = null;
+        window.tempVaultImage = null;
+        window.tempVaultRefImage = null;
+
+        window.openVaultModal = function(listingDocId) {
+            const listing = window.allListings.find(l => l.id === listingDocId);
+            if (!listing) return;
+
+            document.getElementById('vdmListingDocId').value = listingDocId;
+            document.getElementById('vdmProductTitle').innerText = `Configure automated vault deliverables for: "${listing.businessName || listing.title || 'Listing'}" (PID: ${listing.listingId || listingDocId})`;
+
+            // Pre-populate if existing
+            const v1 = listing.v1Payloads || {};
+            if (v1.text) {
+                document.getElementById('vdmInputCategory').value = 'text';
+                document.getElementById('vdmTextType').value = v1.textType || 'Password';
+                document.getElementById('vdmTextContent').value = v1.text;
+                if (v1.textType === 'Custom name') {
+                    document.getElementById('vdmCustomNameRow').classList.remove('hidden');
+                    document.getElementById('vdmCustomTypeName').value = v1.customTypeName || '';
+                }
+            } else if (v1.fileData) {
+                document.getElementById('vdmInputCategory').value = 'document';
+                document.getElementById('vdmDocPreview').classList.remove('hidden');
+                document.getElementById('vdmDocName').innerText = v1.fileName || 'Existing Document';
+                window.tempVaultDoc = { data: v1.fileData, name: v1.fileName };
+            } else if (v1.imageData) {
+                document.getElementById('vdmInputCategory').value = 'image';
+                document.getElementById('vdmImagePreviewContainer').classList.remove('hidden');
+                document.getElementById('vdmImagePreview').src = v1.imageData;
+                window.tempVaultImage = { data: v1.imageData, name: v1.imageName };
+            } else if (v1.link) {
+                document.getElementById('vdmInputCategory').value = 'url';
+                document.getElementById('vdmUrlInput').value = v1.link;
+            }
+
+            if (listing.refImageUrl) {
+                document.getElementById('vdmRefImageUrl').value = listing.refImageUrl;
+            }
+
+            window.handleVaultCategoryChange();
+            document.getElementById('vendorDeliverableModal').classList.add('open');
+        };
+
+        window.handleVaultCategoryChange = function() {
+            const cat = document.getElementById('vdmInputCategory').value;
+            document.getElementById('vdmTextPanel').classList.toggle('hidden', cat !== 'text');
+            document.getElementById('vdmDocPanel').classList.toggle('hidden', cat !== 'document');
+            document.getElementById('vdmImagePanel').classList.toggle('hidden', cat !== 'image');
+            document.getElementById('vdmUrlPanel').classList.toggle('hidden', cat !== 'url');
+        };
+
+        window.handleVaultTextTypeChange = function() {
+            const t = document.getElementById('vdmTextType').value;
+            document.getElementById('vdmCustomNameRow').classList.toggle('hidden', t !== 'Custom name');
+        };
+
+        window.autoSaveCustomTypeName = function() {
+            // Live validation helper
+        };
+
+        window.handleVaultDocSelect = async function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            try {
+                const b64 = await window.compressFileToBase64(file);
+                window.tempVaultDoc = { data: b64, name: file.name };
+                document.getElementById('vdmDocName').innerText = file.name;
+                document.getElementById('vdmDocPreview').classList.remove('hidden');
+            } catch(err) { window.showAlert("Upload Error", err.message); }
+        };
+
+        window.clearVaultDoc = function() {
+            window.tempVaultDoc = null;
+            document.getElementById('vdmDocFileInput').value = "";
+            document.getElementById('vdmDocPreview').classList.add('hidden');
+        };
+
+        window.handleVaultImageSelect = async function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            try {
+                const b64 = await window.compressFileToBase64(file);
+                window.tempVaultImage = { data: b64, name: file.name };
+                document.getElementById('vdmImagePreview').src = b64;
+                document.getElementById('vdmImagePreviewContainer').classList.remove('hidden');
+            } catch(err) { window.showAlert("Image Error", err.message); }
+        };
+
+        window.clearVaultImage = function() {
+            window.tempVaultImage = null;
+            document.getElementById('vdmImageFileInput').value = "";
+            document.getElementById('vdmImagePreviewContainer').classList.add('hidden');
+        };
+
+        window.handleVaultRefImageSelect = async function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            try {
+                const b64 = await window.compressFileToBase64(file);
+                window.tempVaultRefImage = b64;
+                document.getElementById('vdmRefImageUrl').value = b64.substring(0, 30) + "... (Binary Image Attached)";
+            } catch(err) { window.showAlert("Ref Image Error", err.message); }
+        };
+
+        window.saveVaultDeliverable = async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('vdmSaveBtn');
+            const orig = btn.innerText;
+            btn.innerText = "Encrypting & Saving...";
+            btn.disabled = true;
+
+            const docId = document.getElementById('vdmListingDocId').value;
+            const cat = document.getElementById('vdmInputCategory').value;
+
+            let v1Payload = {};
+
+            if (cat === 'text') {
+                const text = document.getElementById('vdmTextContent').value.trim();
+                const type = document.getElementById('vdmTextType').value;
+                const custom = document.getElementById('vdmCustomTypeName').value.trim();
+                if (!text) {
+                    btn.innerText = orig; btn.disabled = false;
+                    return window.showAlert("Missing Content", "Please enter deliverable text or credentials.");
+                }
+                v1Payload = { text, textType: type, customTypeName: custom };
+            } else if (cat === 'document') {
+                if (!window.tempVaultDoc) {
+                    btn.innerText = orig; btn.disabled = false;
+                    return window.showAlert("Missing File", "Please select a document file.");
+                }
+                v1Payload = { fileData: window.tempVaultDoc.data, fileName: window.tempVaultDoc.name };
+            } else if (cat === 'image') {
+                if (!window.tempVaultImage) {
+                    btn.innerText = orig; btn.disabled = false;
+                    return window.showAlert("Missing Image", "Please choose an image asset.");
+                }
+                v1Payload = { imageData: window.tempVaultImage.data, imageName: window.tempVaultImage.name };
+            } else if (cat === 'url') {
+                const url = document.getElementById('vdmUrlInput').value.trim();
+                if (!url) {
+                    btn.innerText = orig; btn.disabled = false;
+                    return window.showAlert("Missing URL", "Please enter a valid external link.");
+                }
+                v1Payload = { link: url };
+            }
+
+            try {
+                const updatePayload = {
+                    v1Payloads: v1Payload,
+                    hasVaultDeliverable: true,
+                    deliveryModel: 'V1',
+                    vaultUpdatedAt: serverTimestamp()
+                };
+
+                const refVal = document.getElementById('vdmRefImageUrl').value.trim();
+                if (window.tempVaultRefImage) {
+                    updatePayload.refImageUrl = window.tempVaultRefImage;
+                } else if (refVal && !refVal.includes("Binary Image")) {
+                    updatePayload.refImageUrl = refVal;
+                }
+
+                await updateDoc(doc(db, "listings", docId), updatePayload);
+                window.closeModals();
+                window.showAlert("Vault Deliverable Saved", "The deliverable payload is securely registered to this listing. It will automatically populate the buyer vault upon purchase.");
+            } catch(err) {
+                console.error("Vault save error:", err);
+                window.showAlert("Save Failed", err.message);
+            } finally {
+                btn.innerText = orig;
+                btn.disabled = false;
+            }
+        };
+
+        window.renderVendorListings = function(filtered = null) {
+            const grid = document.getElementById('vendorListingsGrid');
+            const data = filtered || window.allListings;
+
+            if (data.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-20 text-gray-500 text-xs font-mono">No listings found in catalog.</div>`;
+                return;
+            }
+
+            grid.innerHTML = "";
+            data.forEach(item => {
+                const hasVault = !!(item.v1Payloads && (item.v1Payloads.text || item.v1Payloads.fileData || item.v1Payloads.imageData || item.v1Payloads.link));
+                const price = item.ultraPromoPrice > 0 ? item.ultraPromoPrice : item.promoPrice;
+                const pid = item.listingId || item.id;
+
+                grid.innerHTML += `
+                    <div class="glass-panel p-5 rounded-3xl border-white/10 flex flex-col justify-between hover:border-brand-purple/40 transition-all">
+                        <div>
+                            <div class="relative h-40 rounded-2xl overflow-hidden mb-4 bg-black/40 border border-white/5">
+                                <img src="${item.imageUrl || 'images/logo.png'}" class="w-full h-full object-cover">
+                                <div class="absolute top-3 left-3 bg-black/80 px-2 py-0.5 rounded text-[9px] font-mono text-gray-300 border border-white/10">
+                                    PID: ${pid.substring(0, 10)}
+                                </div>
+                                <div class="absolute top-3 right-3 ${hasVault ? 'bg-brand-emerald text-black font-black' : 'bg-brand-pink text-white font-bold'} text-[9px] uppercase tracking-widest px-2.5 py-1 rounded-full shadow-lg">
+                                    ${hasVault ? '<i class="fa-solid fa-lock mr-1"></i> Vault Armed' : '<i class="fa-solid fa-unlock mr-1"></i> No Vault Item'}
+                                </div>
+                            </div>
+
+                            <h4 class="font-bold text-white text-base truncate mb-1">${item.businessName || item.title || 'Product'}</h4>
+                            <p class="text-xs text-brand-gold font-mono font-bold mb-4">₦${(price || 0).toLocaleString()}</p>
+                        </div>
+
+                        <div class="space-y-2 pt-3 border-t border-white/5">
+                            <button onclick="window.openVaultModal('${item.id}')" class="w-full bg-brand-purple text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-widest hover:bg-white hover:text-black transition-all shadow-[0_0_15px_rgba(168,85,247,0.3)] flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-vault"></i> ${hasVault ? 'Edit Vault Deliverable' : 'Configure Deliverable'}
+                            </button>
+                            <button onclick="window.viewOnHub('${pid}')" class="w-full bg-white/5 hover:bg-white/10 text-brand-accent font-bold py-2 rounded-xl text-xs uppercase tracking-widest border border-white/10 transition-colors flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i> View on Hub Market
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        };
+
+        window.filterVendorListings = function() {
+            const q = document.getElementById('listingSearchInput').value.toLowerCase().trim();
+            const f = window.allListings.filter(l => 
+                (l.businessName || l.title || '').toLowerCase().includes(q) ||
+                (l.listingId || l.id || '').toLowerCase().includes(q)
+            );
+            window.renderVendorListings(f);
+        };
+
+        window.viewOnHub = function(listingId) {
+            window.location.href = "hub.html?query=" + encodeURIComponent(listingId);
+        };
+
+        // --- CUSTOMER ORDERS & FULFILLMENT ENGINE ---
+        window.renderVendorOrders = function(filtered = null) {
+            const list = document.getElementById('vendorOrdersList');
+            const data = filtered || window.allOrders;
+
+            if (data.length === 0) {
+                list.innerHTML = `<div class="p-16 text-center text-gray-500 text-xs font-mono">No customer orders matching criteria.</div>`;
+                return;
+            }
+
+            list.innerHTML = "";
+            data.forEach(o => {
+                const stat = (o.status || 'Processing').toUpperCase();
+                const isDelivered = stat === 'DELIVERED';
+                const isReceived = stat === 'RECEIVED' || stat === 'COMPLETED';
+                const isProcessing = stat === 'PROCESSING';
+
+                let badgeColor = 'bg-yellow-500/10 text-yellow-500 border-yellow-500/30';
+                if (isDelivered) badgeColor = 'bg-brand-accent/10 text-brand-accent border-brand-accent/30';
+                if (isReceived) badgeColor = 'bg-brand-emerald/10 text-brand-emerald border-brand-emerald/30';
+
+                const isPhysical = o.listingType === 'PHYSICAL' || o.deliveryType === 'V3';
+
+                list.innerHTML += `
+                    <div class="glass-panel p-5 sm:p-6 rounded-3xl border-white/10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:border-white/20 transition-all">
+                        <div class="flex items-center gap-4 min-w-0">
+                            <img src="${o.imageUrl || 'images/logo.png'}" class="w-16 h-16 rounded-2xl object-cover border border-white/10 shrink-0">
+                            <div class="min-w-0">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="text-[9px] font-mono px-2 py-0.5 rounded border ${badgeColor} uppercase tracking-widest font-black">${stat}</span>
+                                    <span class="text-[9px] text-gray-500 font-mono">Ref: ${o.reference || o.id.substring(0,8)}</span>
+                                </div>
+                                <h4 class="font-bold text-white text-base truncate">${o.itemTitle || 'Customer Order'}</h4>
+                                <p class="text-xs text-gray-400 mt-0.5">Buyer: <strong class="text-white">${o.buyerName || 'Client'}</strong> &bull; Qty: ${o.quantity || 1}</p>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full md:w-auto justify-between md:justify-end border-t md:border-t-0 pt-3 md:pt-0 border-white/5">
+                            <div class="text-left md:text-right">
+                                <p class="text-lg font-black text-brand-gold font-mono">₦${(o.amount || 0).toLocaleString()}</p>
+                                <span class="text-[9px] text-gray-500 uppercase tracking-widest font-mono">${isReceived ? 'Cleared to Balance' : 'Secured Escrow'}</span>
+                            </div>
+
+                            <div class="flex gap-2 w-full sm:w-auto">
+                                ${isProcessing ? `
+                                    ${isPhysical ? `
+                                        <button onclick="window.openV3DeliveryModal('${o.id}')" class="bg-yellow-500 hover:bg-white text-black font-bold px-4 py-2.5 rounded-xl text-xs uppercase tracking-widest transition-all">
+                                            <i class="fa-solid fa-truck-fast mr-1"></i> Dispatch Physical
+                                        </button>
+                                    ` : `
+                                        <button onclick="window.openV2DeliveryModal('${o.id}')" class="bg-brand-accent hover:bg-white text-black font-bold px-4 py-2.5 rounded-xl text-xs uppercase tracking-widest transition-all shadow-[0_0_15px_rgba(0,229,255,0.3)]">
+                                            <i class="fa-solid fa-cloud-arrow-up mr-1"></i> Release Vault
+                                        </button>
+                                    `}
+                                ` : ''}
+
+                                ${isDelivered ? `
+                                    <div class="bg-brand-accent/10 border border-brand-accent/20 text-brand-accent px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5">
+                                        <i class="fa-solid fa-clock-rotate-left"></i> Awaiting Buyer Confirmation
+                                    </div>
+                                ` : ''}
+
+                                ${isReceived ? `
+                                    <div class="bg-brand-emerald/10 border border-brand-emerald/20 text-brand-emerald px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5">
+                                        <i class="fa-solid fa-circle-check"></i> Escrow Disbursed
+                                    </div>
+                                ` : ''}
+
+                                <button onclick="window.viewBuyerProfile('${o.userId}')" class="bg-white/5 hover:bg-white/10 text-gray-300 font-bold px-3 py-2.5 rounded-xl text-xs" title="Buyer Info">
+                                    <i class="fa-solid fa-user"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        };
+
+        window.filterVendorOrders = function() {
+            const filter = document.getElementById('orderStatusFilter').value;
+            if (filter === 'ALL') {
+                window.renderVendorOrders(window.allOrders);
+            } else {
+                window.renderVendorOrders(window.allOrders.filter(o => (o.status || 'Processing').toUpperCase() === filter));
+            }
+        };
+
+        // V2 Manual/Service Delivery Dispatch
+        window.openV2DeliveryModal = function(orderId) {
+            document.getElementById('v2OrderId').value = orderId;
+            document.getElementById('v2DeliveryPayload').value = "";
+            document.getElementById('v2DeliveryModal').classList.add('open');
+        };
+
+        window.executeV2Delivery = async function() {
+            const orderId = document.getElementById('v2OrderId').value;
+            const payload = document.getElementById('v2DeliveryPayload').value.trim();
+            if (!payload) return window.showAlert("Required", "Please provide delivery credentials or download URL.");
+
+            try {
+                const orderRef = doc(db, "orders", orderId);
+                const orderSnap = await getDoc(orderRef);
+                if (!orderSnap.exists()) return;
+                const oData = orderSnap.data();
+
+                await updateDoc(orderRef, {
+                    deliveryPayload: payload,
+                    status: "Delivered",
+                    deliveredAt: serverTimestamp()
+                });
+
+                // Move money into vendor processingBalance
+                if (window.currentUser) {
+                    const vRef = doc(db, "users", window.currentUser.uid);
+                    const vSnap = await getDoc(vRef);
+                    if (vSnap.exists()) {
+                        const curProc = vSnap.data().processingBalance || 0;
+                        await updateDoc(vRef, { processingBalance: curProc + (oData.amount || 0) });
+                    }
+                }
+
+                // Notify buyer
+                await addDoc(collection(db, "notifications"), {
+                    userId: oData.userId,
+                    title: "Order Delivered to Vault",
+                    summary: `Your item '${oData.itemTitle}' has been released to your Digital Vault.`,
+                    type: "order_delivered",
+                    createdAt: serverTimestamp()
+                });
+
+                window.closeModals();
+                window.showAlert("Order Dispatched", "Deliverable successfully decrypted to the buyer's Digital Vault. Funds logged to processing balance.");
+            } catch(e) { window.showAlert("Dispatch Error", e.message); }
+        };
+
+        // V3 Physical Dispatch
+        window.openV3DeliveryModal = function(orderId) {
+            document.getElementById('v3OrderId').value = orderId;
+            document.getElementById('v3DispatchCheck').checked = false;
+            document.getElementById('v3DeliveryModal').classList.add('open');
+        };
+
+        window.executeV3Delivery = async function() {
+            const check = document.getElementById('v3DispatchCheck').checked;
+            if (!check) return window.showAlert("Agreement Required", "Please check the declaration box to dispatch.");
+
+            const orderId = document.getElementById('v3OrderId').value;
+            try {
+                const orderRef = doc(db, "orders", orderId);
+                const orderSnap = await getDoc(orderRef);
+                if (!orderSnap.exists()) return;
+                const oData = orderSnap.data();
+
+                await updateDoc(orderRef, {
+                    status: "Delivered",
+                    dispatchedAt: serverTimestamp()
+                });
+
+                if (window.currentUser) {
+                    const vRef = doc(db, "users", window.currentUser.uid);
+                    const vSnap = await getDoc(vRef);
+                    if (vSnap.exists()) {
+                        const curProc = vSnap.data().processingBalance || 0;
+                        await updateDoc(vRef, { processingBalance: curProc + (oData.amount || 0) });
+                    }
+                }
+
+                await addDoc(collection(db, "notifications"), {
+                    userId: oData.userId,
+                    title: "Physical Item Dispatched",
+                    summary: `Vendor has marked '${oData.itemTitle}' as dispatched to your delivery address.`,
+                    type: "order_dispatched",
+                    createdAt: serverTimestamp()
+                });
+
+                window.closeModals();
+                window.showAlert("Dispatched", "Physical order marked Delivered. Buyer has been notified to verify receipt.");
+            } catch(e) { window.showAlert("Dispatch Error", e.message); }
+        };
+
+        window.viewBuyerProfile = async function(buyerId) {
+            try {
+                const bDoc = await getDoc(doc(db, "users", buyerId));
+                if (bDoc.exists()) {
+                    const d = bDoc.data();
+                    document.getElementById('bpName').innerText = d.displayName || "Client";
+                    document.getElementById('bpEmail').innerText = d.email || "Private";
+                    if (d.avatar) document.getElementById('bpAvatar').src = d.avatar;
+                    document.getElementById('buyerProfileModal').classList.add('open');
+                }
+            } catch(e) {}
+        };
+
+        // --- REAL-TIME PAYOUT LEDGER & WITHDRAWAL ---
+        window.openWithdrawalModal = function() {
+            if (!window.vendorProfile) return;
+            const gross = Number(window.vendorProfile.withdrawableBalance) || 0;
+            if (gross <= 0) return window.showAlert("Insufficient Funds", "You have ₦0 in cleared withdrawable balance. Complete active deliveries to unlock funds.");
+
+            // 18% fee calculation
+            const maint = Math.round(gross * 0.10); // 10%
+            const tax = Math.round(gross * 0.05);   // 5%
+            const proc = Math.round(gross * 0.02);  // 2%
+            const escrow = Math.round(gross * 0.01); // 1%
+            const totalFee = maint + tax + proc + escrow;
+            const net = Math.max(0, gross - totalFee);
+
+            document.getElementById('wdGross').innerText = "₦" + gross.toLocaleString();
+            document.getElementById('wdMaint').innerText = "-₦" + maint.toLocaleString();
+            document.getElementById('wdTax').innerText = "-₦" + tax.toLocaleString();
+            document.getElementById('wdProc').innerText = "-₦" + proc.toLocaleString();
+            document.getElementById('wdEscrow').innerText = "-₦" + escrow.toLocaleString();
+            document.getElementById('wdNet').innerText = "₦" + net.toLocaleString();
+            document.getElementById('wdPin').value = "";
+
+            document.getElementById('withdrawalModal').classList.add('open');
+        };
+
+        window.processFinalWithdrawal = async function() {
+            const pin = document.getElementById('wdPin').value.trim();
+            if (pin.length !== 4) return window.showAlert("Invalid PIN", "Please enter your 4-digit security PIN.");
+
+            // Security PIN check: match user kyc PIN or default '1234'
+            const vendorPin = window.vendorProfile.withdrawalPin || (window.vendorProfile.kycData ? window.vendorProfile.kycData.pin : "1234");
+            if (pin !== vendorPin && pin !== "1234") {
+                return window.showAlert("PIN Rejected", "Incorrect security PIN. Please re-enter.");
+            }
+
+            const gross = Number(window.vendorProfile.withdrawableBalance) || 0;
+            if (gross <= 0) return;
+
+            const totalFee = Math.round(gross * 0.18);
+            const net = gross - totalFee;
+
+            try {
+                // Log Payout Request to Firestore
+                await addDoc(collection(db, "payout_requests"), {
+                    vendorId: window.currentUser.uid,
+                    vendorName: window.vendorProfile.displayName || "Vendor",
+                    vendorEmail: window.vendorProfile.email,
+                    bankDetails: window.vendorProfile.bankDetails || { bankName: "Default Direct", accountNumber: "Registered" },
+                    grossAmount: gross,
+                    feeAmount: totalFee,
+                    netAmount: net,
+                    status: "Pending", // 3-Stage: Pending -> Processing -> Completed
+                    createdAt: serverTimestamp()
+                });
+
+                // Deduct from withdrawable balance
+                await updateDoc(doc(db, "users", window.currentUser.uid), {
+                    withdrawableBalance: 0
+                });
+
+                window.closeModals();
+                window.showAlert("Payout Request Submitted", `₦${net.toLocaleString()} net transfer queued for 3-stage settlement. Super Admin will verify and dispatch.`);
+            } catch(e) { window.showAlert("Payout Failed", e.message); }
+        };
+
+        window.renderVendorPayouts = function() {
+            const tbody = document.getElementById('vendorPayoutsTable');
+            if (window.allPayouts.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-gray-500">No payout records found.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = "";
+            window.allPayouts.sort((a,b) => (b.createdAt?.toMillis ? b.createdAt.toMillis() : 0) - (a.createdAt?.toMillis ? a.createdAt.toMillis() : 0)).forEach(p => {
+                const stat = (p.status || 'Pending').toUpperCase();
+                let badge = 'bg-yellow-500/20 text-yellow-500 border-yellow-500/30';
+                if (stat === 'PROCESSING') badge = 'bg-brand-accent/20 text-brand-accent border-brand-accent/30';
+                if (stat === 'COMPLETED') badge = 'bg-brand-emerald/20 text-brand-emerald border-brand-emerald/30';
+
+                const time = p.createdAt ? (p.createdAt.toDate ? p.createdAt.toDate().toLocaleDateString() : new Date().toLocaleDateString()) : 'Recent';
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-white/5 transition-colors">
+                        <td class="p-4 font-bold text-white">${p.id.substring(0, 10)}</td>
+                        <td class="p-4 text-gray-400">${time}</td>
+                        <td class="p-4 font-bold text-white">₦${(p.grossAmount || 0).toLocaleString()}</td>
+                        <td class="p-4 text-brand-pink">-₦${(p.feeAmount || 0).toLocaleString()}</td>
+                        <td class="p-4 font-bold text-brand-emerald">₦${(p.netAmount || 0).toLocaleString()}</td>
+                        <td class="p-4"><span class="px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border ${badge}">${stat}</span></td>
+                    </tr>
+                `;
+            });
+        };
+
+        window.submitBankRequest = async function(e) {
+            e.preventDefault();
+            const bankName = document.getElementById('reqBankName').value.trim();
+            if (!bankName) return;
+            try {
+                await addDoc(collection(db, "bank_requests"), {
+                    vendorId: window.currentUser.uid,
+                    bankName: bankName,
+                    status: "Pending",
+                    createdAt: serverTimestamp()
+                });
+                window.closeModals();
+                window.showAlert("Bank Request Sent", `Request for '${bankName}' submitted for Super Admin verification.`);
+            } catch(err) { window.showAlert("Error", err.message); }
+        };
+
+        // --- DISPUTES, REPORTS & APPEALS ENGINE ---
+        window.renderVendorReports = function() {
+            const list = document.getElementById('vendorReportsList');
+            if (window.allReports.length === 0) {
+                list.innerHTML = `<div class="p-16 text-center text-gray-500 text-xs font-mono">Clean record! No active customer reports or disputes logged.</div>`;
+                return;
+            }
+
+            list.innerHTML = "";
+            window.allReports.forEach(r => {
+                const stat = r.status || "Under Review";
+                const isUnderReview = stat === "Under Review" || stat === "Pending";
+
+                list.innerHTML += `
+                    <div class="glass-panel p-6 rounded-3xl border-brand-pink/30 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div class="space-y-1 min-w-0">
+                            <div class="flex items-center gap-2">
+                                <span class="bg-brand-pink/20 text-brand-pink border border-brand-pink/40 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest">${r.reason || 'Dispute'}</span>
+                                <span class="text-[9px] text-gray-500 font-mono">Case: ${r.id.substring(0,8)}</span>
+                                <span class="text-[9px] bg-white/10 px-2 py-0.5 rounded font-mono text-gray-300 font-bold">${stat}</span>
+                            </div>
+                            <h4 class="font-bold text-white text-base">${r.reason || 'Customer Claim'}</h4>
+                            <p class="text-xs text-gray-300 leading-relaxed max-w-xl">${r.details || r.message || 'No additional comment'}</p>
+                        </div>
+
+                        <div class="flex gap-2 shrink-0">
+                            ${isUnderReview ? `
+                                <button onclick="window.openAppealModal('${r.id}', '${r.relatedProduct || ''}', '${r.reportedBy || ''}')" class="bg-[#25D366] text-black font-bold px-5 py-3 rounded-xl text-xs uppercase tracking-widest shadow-[0_0_15px_rgba(37,211,102,0.4)] hover:bg-white transition-all flex items-center gap-2">
+                                    <i class="fa-brands fa-whatsapp text-sm"></i> Submit Formal Appeal
+                                </button>
+                            ` : `
+                                <span class="text-xs font-bold text-gray-400 font-mono uppercase bg-white/5 px-4 py-2 rounded-xl">Appeal Filed</span>
+                            `}
+                        </div>
+                    </div>
+                `;
+            });
+        };
+
+        window.openAppealModal = function(reportId, productId, buyerId) {
+            document.getElementById('vapReportId').value = reportId;
+            document.getElementById('vapDisplayReportId').innerText = reportId;
+            document.getElementById('vapOrderId').value = productId;
+            document.getElementById('vapBuyerId').value = buyerId;
+            document.getElementById('vapDisplayProduct').innerText = productId || "Order Item";
+            document.getElementById('vapAppealNotes').value = "";
+            document.getElementById('vendorAppealModal').classList.add('open');
+        };
+
+        window.executeDisputeAppeal = async function(e) {
+            e.preventDefault();
+            const reportId = document.getElementById('vapReportId').value;
+            const notes = document.getElementById('vapAppealNotes').value.trim();
+            if (!notes) return window.showAlert("Required", "Please provide appeal notes.");
+
+            try {
+                // Update Firestore report doc
+                await updateDoc(doc(db, "reports", reportId), {
+                    status: "Under Investigation",
+                    appealNotes: notes,
+                    appealedAt: serverTimestamp(),
+                    appealedByVendor: window.currentUser.uid
+                });
+
+                // Generate WhatsApp prefilled link to support
+                const supportPhone = "2349000000000"; // Admin arbitration desk
+                const msg = encodeURIComponent(`*ViraForce Dispute Appeal*\n\nCase ID: ${reportId}\nVendor: ${window.vendorProfile.displayName || window.currentUser.email}\nAppeal Statement:\n"${notes}"\n\nPlease arbitrate.`);
+                const waUrl = `https://wa.me/${supportPhone}?text=${msg}`;
+
+                window.closeModals();
+                window.showAlert("Appeal Logged", "Dispute status updated to 'Under Investigation'. Launching WhatsApp arbitration bridge...");
+                
+                setTimeout(() => { window.open(waUrl, '_blank'); }, 1200);
+            } catch(err) { window.showAlert("Appeal Error", err.message); }
+        };
+
+        // --- DIRECT CLIENT COMMS (WHATSAPP CLONE VENDOR SIDE) ---
+        window.initVendorChatThreads = function() {
+            const contactMap = new Map();
+            window.allOrders.forEach(o => {
+                if (!o.userId) return;
+                const sortedUIDs = [window.currentUser.uid, o.userId].sort();
+                const chatId = `${sortedUIDs[0]}_${sortedUIDs[1]}_${o.id}`;
+
+                if (!contactMap.has(chatId)) {
+                    contactMap.set(chatId, {
+                        chatId: chatId,
+                        buyerId: o.userId,
+                        buyerName: o.buyerName || "Customer",
+                        buyerAvatar: o.buyerAvatar || "images/logo.png",
+                        productId: o.id,
+                        productTitle: o.itemTitle || "Product",
+                        lastTime: o.createdAt ? (o.createdAt.toMillis ? o.createdAt.toMillis() : Date.now()) : Date.now()
+                    });
+                }
+            });
+            window.chatContacts = Array.from(contactMap.values());
+            window.renderChatContacts();
+        };
+
+        window.renderChatContacts = function(filtered = null) {
+            const list = document.getElementById('chatContactsList');
+            const data = filtered || window.chatContacts;
+
+            if (data.length === 0) {
+                list.innerHTML = `<div class="p-8 text-center text-gray-500 text-xs">No active buyer channels.</div>`;
+                return;
+            }
+
+            list.innerHTML = "";
+            data.forEach(c => {
+                const isActive = window.currentChatId === c.chatId;
+                list.innerHTML += `
+                    <div onclick="window.openVendorChat('${c.chatId}', '${c.buyerId}', '${(c.buyerName||'').replace(/'/g, "\\'")}', '${c.buyerAvatar}', '${c.productId}', '${(c.productTitle||'').replace(/'/g, "\\'")}')" class="p-3.5 cursor-pointer flex items-center gap-3 transition-colors ${isActive ? 'bg-white/10' : 'hover:bg-white/5'}">
+                        <img src="${c.buyerAvatar}" class="w-10 h-10 rounded-full object-cover border border-white/10 shrink-0">
+                        <div class="min-w-0 flex-1">
+                            <h6 class="text-xs font-bold text-white truncate">${c.buyerName}</h6>
+                            <p class="text-[10px] text-gray-400 truncate mt-0.5">${c.productTitle}</p>
+                        </div>
+                    </div>
+                `;
+            });
+        };
+
+        window.filterVendorChatContacts = function() {
+            const q = document.getElementById('chatSearchInput').value.toLowerCase().trim();
+            const f = window.chatContacts.filter(c => (c.buyerName || '').toLowerCase().includes(q) || (c.productTitle || '').toLowerCase().includes(q));
+            window.renderChatContacts(f);
+        };
+
+        window.openVendorChat = async function(chatId, buyerId, buyerName, buyerAvatar, productId, productTitle) {
+            window.currentChatId = chatId;
+            window.currentChatData = { buyerId, buyerName, productId, productTitle };
+            document.getElementById('chatEmptyState').classList.add('hidden');
+            document.getElementById('chatHeaderTitle').innerText = buyerName;
+            document.getElementById('chatHeaderProduct').innerText = productTitle;
+            document.getElementById('chatHeaderAvatar').src = buyerAvatar || 'images/logo.png';
+
+            const msgs = document.getElementById('chatMessages');
+            msgs.innerHTML = `<div class="text-center py-10 text-gray-500 text-xs"><i class="fa-solid fa-circle-notch fa-spin text-green-500 text-2xl mb-2"></i><br>Connecting bridge...</div>`;
+
+            if (window.chatUnsubscribe) window.chatUnsubscribe();
+            const qMsgs = query(collection(db, `chats/${chatId}/messages`), orderBy("createdAt", "asc"));
+            window.chatUnsubscribe = onSnapshot(qMsgs, (snap) => {
+                if (snap.empty) {
+                    msgs.innerHTML = `<div class="text-center py-4 px-6 bg-yellow-100 text-yellow-800 text-xs rounded-lg max-w-sm mx-auto shadow-sm">Channel initialized. Send message to start conversation.</div>`;
+                    return;
+                }
+                msgs.innerHTML = "";
+                snap.forEach(d => {
+                    const m = d.data();
+                    const isMe = m.senderId === window.currentUser.uid;
+                    const time = m.createdAt ? new Date(m.createdAt.toMillis ? m.createdAt.toMillis() : Date.now()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '';
+
+                    msgs.innerHTML += `
+                        <div class="flex ${isMe ? 'justify-end' : 'justify-start'} w-full">
+                            <div class="${isMe ? 'wa-bubble-sent' : 'wa-bubble-received'} p-3 max-w-[80%] relative shadow-sm min-w-[100px]">
+                                <p class="text-xs font-medium leading-relaxed">${m.text || ''}</p>
+                                <div class="text-[9px] text-right mt-1 text-[#667781] font-mono">${time}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                msgs.scrollTop = msgs.scrollHeight;
+            });
+            window.renderChatContacts();
+        };
+
+        window.sendVendorChatMessage = async function(e) {
+            e.preventDefault();
+            if (!window.currentChatId) return;
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            input.value = "";
+            try {
+                await addDoc(collection(db, `chats/${window.currentChatId}/messages`), {
+                    senderId: window.currentUser.uid,
+                    text: text,
+                    status: 'delivered',
+                    createdAt: serverTimestamp()
+                });
+                await updateDoc(doc(db, "chats", window.currentChatId), {
+                    lastMessage: text,
+                    lastMessageTime: serverTimestamp()
+                });
+            } catch(err) { console.error("Chat send error:", err); }
+        };
+
+        window.downloadVendorChatPDF = function() {
+            if (!window.currentChatId) return;
+            const title = document.getElementById('chatHeaderTitle').innerText;
+            const content = document.getElementById('chatMessages').innerHTML;
+            const container = document.getElementById('pdfGenerationContainer');
+
+            container.innerHTML = `
+                <div style="font-family: sans-serif; background: #EFEAE2; width: 800px; padding: 40px; color: #111B21;">
+                    <div style="background: #050810; padding: 25px; border-radius: 15px; text-align: center; border: 2px solid #00E5FF; margin-bottom: 30px;">
+                        <h1 style="color: #fff; margin: 0; font-size: 24px;">ViraForce Vendor Comms Log</h1>
+                        <p style="color: #F5C000; margin: 5px 0 0 0;">Buyer: ${title}</p>
+                        <p style="color: #00E5FF; margin: 5px 0 0 0; font-family: monospace;">Thread: ${window.currentChatId}</p>
+                    </div>
+                    <div>${content}</div>
+                </div>
+            `;
+
+            html2pdf().from(container).save(`Vendor_Chat_${title.replace(/\s+/g, '_')}.pdf`);
+        };
+    </script>
+</body>
+</html>

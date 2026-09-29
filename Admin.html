@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth antialiased bg-[#03040B]">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus Command | Super Admin Portal</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    },
+                    colors: {
+                        brand: { 900: '#03040B', 800: '#0A0D14', accent: '#00E5FF', emerald: '#00FF9D', pink: '#FF007F', gold: '#F5C000', purple: '#A855F7' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #03040B; color: #E2E8F0; }
+        .glass-panel { background: rgba(10, 13, 20, 0.75); backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .tab-btn.active { background: rgba(0, 229, 255, 0.1); color: #00E5FF; border-left: 3px solid #00E5FF; }
+        .view-section { display: none; }
+        .view-section.active { display: block; }
+        .admin-input { background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.1); color: #fff; }
+        .admin-input:focus { outline: none; border-color: #00E5FF; box-shadow: 0 0 0 2px rgba(0, 229, 255, 0.2); }
+        .overlay-mask { transition: opacity 0.3s ease; opacity: 0; pointer-events: none; }
+        .overlay-mask.open { opacity: 1; pointer-events: auto; }
+        #sidebar { transition: transform 0.3s ease; }
+        @media (max-width: 1024px) {
+            #sidebar { transform: translateX(-100%); position: fixed; height: 100vh; z-index: 50; }
+            #sidebar.open { transform: translateX(0); }
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col md:flex-row text-sm">
+
+    <div id="sidebarMask" onclick="window.toggleSidebar()" class="overlay-mask fixed inset-0 w-full h-full bg-black/80 z-[40] lg:hidden"></div>
+
+    <!-- Modals -->
+    <div id="customAlertModal" class="overlay-mask fixed inset-0 flex items-center justify-center p-4 z-[200]">
+        <div class="glass-panel p-8 rounded-3xl w-full max-w-sm text-center border-brand-accent/40">
+            <h3 id="alertTitle" class="text-xl font-bold text-white mb-2">Notification</h3>
+            <p id="alertMessage" class="text-xs text-gray-400 mb-6 leading-relaxed"></p>
+            <button onclick="window.closeModals()" class="w-full bg-brand-accent text-black font-bold py-3 rounded-xl uppercase tracking-widest text-xs">Acknowledge</button>
+        </div>
+    </div>
+
+    <!-- Settlement Confirmation Modal -->
+    <div id="payoutActionModal" class="overlay-mask fixed inset-0 flex items-center justify-center p-4 z-[150]">
+        <div class="glass-panel p-8 rounded-3xl w-full max-w-md border-brand-emerald/40">
+            <h3 class="text-xl font-black text-white mb-2" id="payoutModalTitle">Advance Payout Stage</h3>
+            <p class="text-xs text-gray-400 mb-6" id="payoutModalDesc">Transition settlement stage for this payout request.</p>
+            <input type="hidden" id="pomPayoutId">
+            <input type="hidden" id="pomTargetStatus">
+
+            <div class="bg-black/50 p-4 rounded-xl border border-white/5 space-y-2 font-mono text-xs mb-6" id="payoutModalSummary"></div>
+
+            <div class="flex gap-3 justify-end">
+                <button onclick="window.closeModals()" class="px-5 py-2.5 rounded-xl text-xs font-bold text-gray-400 hover:text-white">Cancel</button>
+                <button onclick="window.confirmPayoutTransition()" class="bg-brand-emerald text-black font-black px-6 py-2.5 rounded-xl text-xs uppercase tracking-widest hover:bg-white transition-all" id="pomSubmitBtn">Execute Transition</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="bg-[#0A0D14] border-r border-white/5 flex flex-col flex-shrink-0 w-64 z-50">
+        <div class="h-20 border-b border-white/5 flex items-center justify-between px-6">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-brand-accent/10 border border-brand-accent/30 flex items-center justify-center text-brand-accent">
+                    <i class="fa-solid fa-bolt-lightning text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="font-display font-black text-white text-base tracking-tight leading-none">NEXUS</h1>
+                    <span class="text-[9px] font-bold text-brand-accent uppercase tracking-[0.2em] mt-1 block font-mono">Super Admin</span>
+                </div>
+            </div>
+            <button onclick="window.toggleSidebar()" class="lg:hidden text-gray-400"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <nav class="flex-1 py-6 flex flex-col gap-1.5 overflow-y-auto px-4">
+            <a href="index.html" class="flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-black bg-gradient-to-r from-brand-accent to-blue-500 mb-6 text-xs uppercase tracking-widest">
+                <i class="fa-solid fa-arrow-left-long"></i> Hub Market
+            </a>
+
+            <button onclick="window.switchTab('overview')" id="tab-overview" class="tab-btn active text-left px-4 py-3 text-xs font-bold text-gray-300 flex items-center gap-3 w-full rounded-xl">
+                <i class="fa-solid fa-gauge-high w-5 text-center text-brand-accent"></i> System Overview
+            </button>
+            <button onclick="window.switchTab('payouts')" id="tab-payouts" class="tab-btn text-left px-4 py-3 text-xs font-bold text-gray-300 flex items-center gap-3 w-full rounded-xl">
+                <i class="fa-solid fa-money-check-dollar w-5 text-center text-brand-emerald"></i> 3-Stage Settlements
+            </button>
+            <button onclick="window.switchTab('reports')" id="tab-reports" class="tab-btn text-left px-4 py-3 text-xs font-bold text-gray-300 flex items-center gap-3 w-full rounded-xl">
+                <i class="fa-solid fa-gavel w-5 text-center text-brand-pink"></i> Dispute Arbitration
+            </button>
+            <button onclick="window.switchTab('banks')" id="tab-banks" class="tab-btn text-left px-4 py-3 text-xs font-bold text-gray-300 flex items-center gap-3 w-full rounded-xl">
+                <i class="fa-solid fa-building-columns w-5 text-center text-brand-gold"></i> Bank Requests
+            </button>
+            <button onclick="window.switchTab('settings')" id="tab-settings" class="tab-btn text-left px-4 py-3 text-xs font-bold text-gray-300 flex items-center gap-3 w-full rounded-xl">
+                <i class="fa-solid fa-bullhorn w-5 text-center text-brand-purple"></i> Global Announcement
+            </button>
+        </nav>
+    </aside>
+
+    <!-- MAIN VIEW -->
+    <main class="flex-1 overflow-y-auto relative flex flex-col h-full bg-[#03040B]">
+        <!-- Header -->
+        <header class="h-20 border-b border-white/5 bg-[#0A0D14]/80 backdrop-blur-2xl flex items-center justify-between px-6 lg:px-10 sticky top-0 z-30">
+            <div class="flex items-center gap-4">
+                <button onclick="window.toggleSidebar()" class="lg:hidden text-white"><i class="fa-solid fa-bars"></i></button>
+                <h2 id="pageTitle" class="font-black text-xl text-white">System Overview</h2>
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="hub.html" class="bg-white/5 hover:bg-white/10 text-white font-bold px-4 py-2 rounded-xl text-xs uppercase tracking-widest border border-white/10 flex items-center gap-2">
+                    <i class="fa-solid fa-store text-brand-gold"></i> View Market
+                </a>
+            </div>
+        </header>
+
+        <div class="p-6 lg:p-10 space-y-8 flex-1">
+            
+            <!-- Global Metrics -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="glass-panel p-5 rounded-2xl border-brand-accent/20">
+                    <span class="text-[9px] font-bold text-gray-400 uppercase tracking-widest font-mono">Secured Escrow Total</span>
+                    <p class="text-2xl font-black text-brand-accent font-mono mt-2" id="metricEscrow">₦0</p>
+                    <p class="text-[10px] text-gray-500 mt-1">Orders in processing/delivered state</p>
+                </div>
+                <div class="glass-panel p-5 rounded-2xl border-brand-emerald/20">
+                    <span class="text-[9px] font-bold text-gray-400 uppercase tracking-widest font-mono">Cleared Member Balances</span>
+                    <p class="text-2xl font-black text-brand-emerald font-mono mt-2" id="metricCleared">₦0</p>
+                    <p class="text-[10px] text-gray-500 mt-1">Withdrawable vendor balances</p>
+                </div>
+                <div class="glass-panel p-5 rounded-2xl border-brand-gold/20">
+                    <span class="text-[9px] font-bold text-gray-400 uppercase tracking-widest font-mono">Pending Payout Demands</span>
+                    <p class="text-2xl font-black text-brand-gold font-mono mt-2" id="metricPayouts">₦0</p>
+                    <p class="text-[10px] text-gray-500 mt-1" id="metricPayoutCount">0 requests queued</p>
+                </div>
+                <div class="glass-panel p-5 rounded-2xl border-brand-pink/20">
+                    <span class="text-[9px] font-bold text-gray-400 uppercase tracking-widest font-mono">Arbitration Cases</span>
+                    <p class="text-2xl font-black text-brand-pink font-mono mt-2" id="metricDisputes">0</p>
+                    <p class="text-[10px] text-gray-500 mt-1">Open buyer claims & appeals</p>
+                </div>
+            </div>
+
+            <!-- VIEW: OVERVIEW -->
+            <section id="view-overview" class="view-section active space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="glass-panel p-6 rounded-3xl border-white/10">
+                        <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2"><i class="fa-solid fa-clock-rotate-left text-brand-accent"></i> Recent Marketplace Orders</h3>
+                        <div id="recentOrdersList" class="space-y-3">
+                            <div class="p-8 text-center text-gray-500 text-xs font-mono">Connecting to ledger...</div>
+                        </div>
+                    </div>
+                    <div class="glass-panel p-6 rounded-3xl border-white/10">
+                        <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2"><i class="fa-solid fa-list-check text-brand-gold"></i> Fast Actions</h3>
+                        <div class="space-y-3">
+                            <button onclick="window.switchTab('payouts')" class="w-full bg-brand-emerald/10 hover:bg-brand-emerald text-brand-emerald hover:text-black font-bold p-4 rounded-2xl border border-brand-emerald/30 text-left flex justify-between items-center transition-all text-xs uppercase tracking-widest">
+                                <span><i class="fa-solid fa-money-check-dollar mr-2"></i> Review Pending Payouts</span>
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                            <button onclick="window.switchTab('reports')" class="w-full bg-brand-pink/10 hover:bg-brand-pink text-brand-pink hover:text-white font-bold p-4 rounded-2xl border border-brand-pink/30 text-left flex justify-between items-center transition-all text-xs uppercase tracking-widest">
+                                <span><i class="fa-solid fa-gavel mr-2"></i> Inspect Buyer Claims & Appeals</span>
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                            <button onclick="window.switchTab('settings')" class="w-full bg-white/5 hover:bg-white/10 text-white font-bold p-4 rounded-2xl border border-white/10 text-left flex justify-between items-center transition-all text-xs uppercase tracking-widest">
+                                <span><i class="fa-solid fa-bullhorn mr-2"></i> Broadcast Announcement</span>
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW: 3-STAGE SETTLEMENTS (PAYOUTS) -->
+            <section id="view-payouts" class="view-section space-y-6">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h3 class="text-2xl font-black text-white">3-Stage Payout Settlement Queue</h3>
+                        <p class="text-xs text-gray-400 mt-1">Lifecycle: <strong>Pending</strong> &rarr; <strong>Processing</strong> (Bank Dispatch) &rarr; <strong>Completed</strong> (Settled with Receipt)</p>
+                    </div>
+                </div>
+
+                <div class="glass-panel rounded-3xl border-white/10 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs font-mono">
+                            <thead class="bg-black/60 border-b border-white/10 text-gray-400 uppercase text-[10px]">
+                                <tr>
+                                    <th class="p-4">Vendor</th>
+                                    <th class="p-4">Gross</th>
+                                    <th class="p-4">18% Fees</th>
+                                    <th class="p-4">Net Payout</th>
+                                    <th class="p-4">Bank Account</th>
+                                    <th class="p-4">Status</th>
+                                    <th class="p-4 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="payoutsTableBody" class="divide-y divide-white/5 text-gray-200">
+                                <tr><td colspan="7" class="p-8 text-center text-gray-500">Loading payout queue...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW: DISPUTE ARBITRATION -->
+            <section id="view-reports" class="view-section space-y-6">
+                <div>
+                    <h3 class="text-2xl font-black text-white">Dispute Claims & Formal Vendor Appeals</h3>
+                    <p class="text-xs text-gray-400 mt-1">Super Admin arbitration chamber for contested orders.</p>
+                </div>
+                <div id="adminReportsList" class="space-y-4">
+                    <div class="p-16 text-center text-gray-500 text-xs font-mono">Scanning arbitration cases...</div>
+                </div>
+            </section>
+
+            <!-- VIEW: BANK REQUESTS -->
+            <section id="view-banks" class="view-section space-y-6">
+                <div>
+                    <h3 class="text-2xl font-black text-white">Bank Directory Addition Requests</h3>
+                    <p class="text-xs text-gray-400 mt-1">Vendor-submitted institution names requiring verification.</p>
+                </div>
+                <div id="bankRequestsList" class="space-y-3">
+                    <div class="p-12 text-center text-gray-500 text-xs">Checking requests...</div>
+                </div>
+            </section>
+
+            <!-- VIEW: ANNOUNCEMENT SETTINGS -->
+            <section id="view-settings" class="view-section space-y-6">
+                <div class="glass-panel p-8 rounded-3xl border-white/10 max-w-2xl">
+                    <h3 class="text-xl font-bold text-white mb-2 flex items-center gap-2"><i class="fa-solid fa-bullhorn text-brand-purple"></i> Global Market Announcement</h3>
+                    <p class="text-xs text-gray-400 mb-6">Updates the top marquee banner in real-time across all marketplace sessions.</p>
+
+                    <form onsubmit="window.saveGlobalAnnouncement(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Banner Broadcast Text</label>
+                            <textarea id="announcementText" class="admin-input w-full p-4 rounded-xl text-xs h-28 resize-none" placeholder="⚡ ViraForce Marketplace Active..." required></textarea>
+                        </div>
+                        <button type="submit" id="saveAnnBtn" class="bg-brand-purple text-white font-bold px-6 py-3 rounded-xl text-xs uppercase tracking-widest hover:bg-white hover:text-black transition-all">
+                            Broadcast to All Portals
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- FIREBASE & ADMIN SCRIPT -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, query, where, orderBy, serverTimestamp, onSnapshot, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCefntIh-4jl9ku4lPEmnyEC4VoT_MXxFk",
+            authDomain: "vfa-product.firebaseapp.com",
+            projectId: "vfa-product",
+            storageBucket: "vfa-product.firebasestorage.app",
+            messagingSenderId: "245947400859",
+            appId: "1:245947400859:web:b92bf4ea3a8cbabc713c3e"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        window.currentUser = null;
+        window.allOrders = [];
+        window.allPayouts = [];
+        window.allReports = [];
+        window.allBanks = [];
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                window.currentUser = user;
+                window.initAdminListeners();
+            } else {
+                window.location.href = "index.html";
+            }
+        });
+
+        window.toggleSidebar = function() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('sidebarMask').classList.toggle('open');
+        };
+
+        window.switchTab = function(tabId) {
+            document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            const target = document.getElementById(`view-${tabId}`);
+            if (target) target.classList.add('active');
+            const btn = document.getElementById(`tab-${tabId}`);
+            if (btn) btn.classList.add('active');
+            const titles = { 'overview': 'System Overview', 'payouts': '3-Stage Settlements', 'reports': 'Dispute Arbitration', 'banks': 'Bank Requests', 'settings': 'Global Announcement' };
+            document.getElementById('pageTitle').innerText = titles[tabId] || 'Command Center';
+            if (window.innerWidth <= 1024) window.toggleSidebar();
+        };
+
+        window.closeModals = function() {
+            document.querySelectorAll('.overlay-mask').forEach(m => m.classList.remove('open'));
+        };
+
+        window.showAlert = function(title, msg) {
+            document.getElementById('alertTitle').innerText = title;
+            document.getElementById('alertMessage').innerText = msg;
+            document.getElementById('customAlertModal').classList.add('open');
+        };
+
+        // --- LISTENERS ---
+        window.initAdminListeners = function() {
+            // Orders
+            const qOrders = query(collection(db, "orders"), orderBy("createdAt", "desc"));
+            onSnapshot(qOrders, (snap) => {
+                window.allOrders = [];
+                snap.forEach(d => window.allOrders.push({ ...d.data(), id: d.id }));
+                window.updateMetrics();
+                window.renderRecentOrders();
+            });
+
+            // Payouts
+            const qPayouts = query(collection(db, "payout_requests"), orderBy("createdAt", "desc"));
+            onSnapshot(qPayouts, (snap) => {
+                window.allPayouts = [];
+                snap.forEach(d => window.allPayouts.push({ ...d.data(), id: d.id }));
+                window.updateMetrics();
+                window.renderPayouts();
+            });
+
+            // Reports & Appeals
+            const qReports = query(collection(db, "reports"), orderBy("createdAt", "desc"));
+            onSnapshot(qReports, (snap) => {
+                window.allReports = [];
+                snap.forEach(d => window.allReports.push({ ...d.data(), id: d.id }));
+                window.updateMetrics();
+                window.renderReports();
+            });
+
+            // Bank Requests
+            const qBanks = query(collection(db, "bank_requests"), orderBy("createdAt", "desc"));
+            onSnapshot(qBanks, (snap) => {
+                window.allBanks = [];
+                snap.forEach(d => window.allBanks.push({ ...d.data(), id: d.id }));
+                window.renderBanks();
+            });
+
+            // Global Announcement
+            getDoc(doc(db, "admin_settings", "global_announcement")).then(d => {
+                if (d.exists() && d.data().message) {
+                    document.getElementById('announcementText').value = d.data().message;
+                }
+            }).catch(()=>{});
+
+            // Real-time cleared member balances calculation
+            const qUsers = query(collection(db, "users"), where("isVendor", "==", true));
+            onSnapshot(qUsers, (snap) => {
+                let totalCleared = 0;
+                snap.forEach(d => {
+                    totalCleared += Number(d.data().withdrawableBalance) || 0;
+                });
+                document.getElementById('metricCleared').innerText = "₦" + totalCleared.toLocaleString();
+            });
+        };
+
+        window.updateMetrics = function() {
+            let escrowTotal = 0;
+            window.allOrders.forEach(o => {
+                const s = (o.status || '').toUpperCase();
+                if (s === 'PROCESSING' || s === 'DELIVERED') {
+                    escrowTotal += Number(o.amount) || 0;
+                }
+            });
+            document.getElementById('metricEscrow').innerText = "₦" + escrowTotal.toLocaleString();
+
+            let pendingPayouts = 0;
+            let pendingCount = 0;
+            window.allPayouts.forEach(p => {
+                const s = (p.status || '').toUpperCase();
+                if (s === 'PENDING' || s === 'PROCESSING') {
+                    pendingPayouts += Number(p.netAmount) || 0;
+                    pendingCount++;
+                }
+            });
+            document.getElementById('metricPayouts').innerText = "₦" + pendingPayouts.toLocaleString();
+            document.getElementById('metricPayoutCount').innerText = `${pendingCount} demands active`;
+
+            document.getElementById('metricDisputes').innerText = window.allReports.length;
+        };
+
+        window.renderRecentOrders = function() {
+            const list = document.getElementById('recentOrdersList');
+            if (window.allOrders.length === 0) {
+                list.innerHTML = `<div class="p-8 text-center text-gray-500 text-xs">No orders recorded.</div>`;
+                return;
+            }
+            list.innerHTML = "";
+            window.allOrders.slice(0, 8).forEach(o => {
+                const stat = (o.status || 'Processing').toUpperCase();
+                list.innerHTML += `
+                    <div class="p-3 bg-black/40 rounded-xl border border-white/5 flex items-center justify-between text-xs">
+                        <div class="min-w-0 flex-1">
+                            <span class="font-bold text-white truncate block">${o.itemTitle || 'Order'}</span>
+                            <span class="text-[10px] text-gray-500 font-mono">Ref: ${o.reference || o.id.substring(0,8)}</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="font-bold text-brand-gold font-mono block">₦${(o.amount || 0).toLocaleString()}</span>
+                            <span class="text-[9px] uppercase tracking-widest text-gray-400 font-bold">${stat}</span>
+                        </div>
+                    </div>
+                `;
+            });
+        };
+
+        // --- 3-STAGE PAYOUT EXECUTION ---
+        window.renderPayouts = function() {
+            const tbody = document.getElementById('payoutsTableBody');
+            if (window.allPayouts.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-gray-500">No payout requests in ledger.</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = "";
+            window.allPayouts.forEach(p => {
+                const stat = (p.status || 'Pending').toUpperCase();
+                let badge = 'bg-yellow-500/20 text-yellow-500 border-yellow-500/30';
+                if (stat === 'PROCESSING') badge = 'bg-brand-accent/20 text-brand-accent border-brand-accent/30';
+                if (stat === 'COMPLETED') badge = 'bg-brand-emerald/20 text-brand-emerald border-brand-emerald/30';
+
+                let actions = '';
+                if (stat === 'PENDING') {
+                    actions = `<button onclick="window.openPayoutModal('${p.id}', 'Processing')" class="bg-brand-accent text-black font-bold px-3 py-1.5 rounded-lg text-[10px] uppercase tracking-wider hover:bg-white transition-all">Advance to Processing</button>`;
+                } else if (stat === 'PROCESSING') {
+                    actions = `<button onclick="window.openPayoutModal('${p.id}', 'Completed')" class="bg-brand-emerald text-black font-bold px-3 py-1.5 rounded-lg text-[10px] uppercase tracking-wider hover:bg-white transition-all">Execute Completed</button>`;
+                } else {
+                    actions = `<span class="text-brand-emerald font-bold text-[10px] uppercase"><i class="fa-solid fa-check-double mr-1"></i> Settled</span>`;
+                }
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-white/5 transition-colors">
+                        <td class="p-4">
+                            <span class="font-bold text-white block">${p.vendorName || 'Vendor'}</span>
+                            <span class="text-[10px] text-gray-500 font-mono">${p.vendorEmail || p.vendorId?.substring(0,8)}</span>
+                        </td>
+                        <td class="p-4 text-gray-300">₦${(p.grossAmount || 0).toLocaleString()}</td>
+                        <td class="p-4 text-brand-pink">-₦${(p.feeAmount || 0).toLocaleString()}</td>
+                        <td class="p-4 font-bold text-brand-emerald">₦${(p.netAmount || 0).toLocaleString()}</td>
+                        <td class="p-4 text-gray-400">${p.bankDetails ? `${p.bankDetails.bankName || ''} (${p.bankDetails.accountNumber || ''})` : 'Direct'}</td>
+                        <td class="p-4"><span class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest border ${badge}">${stat}</span></td>
+                        <td class="p-4 text-right">${actions}</td>
+                    </tr>
+                `;
+            });
+        };
+
+        window.openPayoutModal = function(payoutId, targetStatus) {
+            const p = window.allPayouts.find(x => x.id === payoutId);
+            if (!p) return;
+
+            document.getElementById('pomPayoutId').value = payoutId;
+            document.getElementById('pomTargetStatus').value = targetStatus;
+            document.getElementById('payoutModalTitle').innerText = targetStatus === 'Processing' ? 'Advance to Stage 2: Processing' : 'Execute Stage 3: Completed Settlement';
+            document.getElementById('payoutModalDesc').innerText = targetStatus === 'Processing' ? 'Marks transfer as active bank clearance.' : 'Confirms bank receipt and finalizes settlement.';
+
+            document.getElementById('payoutModalSummary').innerHTML = `
+                <div class="flex justify-between"><span class="text-gray-500">Recipient:</span><span class="text-white font-bold">${p.vendorName}</span></div>
+                <div class="flex justify-between"><span class="text-gray-500">Net Transfer:</span><span class="text-brand-emerald font-bold">₦${(p.netAmount || 0).toLocaleString()}</span></div>
+                <div class="flex justify-between"><span class="text-gray-500">Target Stage:</span><span class="text-brand-accent font-bold">${targetStatus}</span></div>
+            `;
+
+            document.getElementById('payoutActionModal').classList.add('open');
+        };
+
+        window.confirmPayoutTransition = async function() {
+            const payoutId = document.getElementById('pomPayoutId').value;
+            const targetStatus = document.getElementById('pomTargetStatus').value;
+            const p = window.allPayouts.find(x => x.id === payoutId);
+
+            try {
+                await updateDoc(doc(db, "payout_requests", payoutId), {
+                    status: targetStatus,
+                    [`${targetStatus.toLowerCase()}At`]: serverTimestamp()
+                });
+
+                if (p && p.vendorId) {
+                    await addDoc(collection(db, "notifications"), {
+                        userId: p.vendorId,
+                        title: `Payout ${targetStatus}`,
+                        summary: `Your withdrawal request of ₦${(p.netAmount || 0).toLocaleString()} has transitioned to stage '${targetStatus}'.`,
+                        type: "payout_update",
+                        createdAt: serverTimestamp()
+                    });
+                }
+
+                window.closeModals();
+                window.showAlert("Settlement Updated", `Payout ${payoutId} advanced to '${targetStatus}'.`);
+            } catch(e) { window.showAlert("Update Error", e.message); }
+        };
+
+        // --- DISPUTE ARBITRATION ---
+        window.renderReports = function() {
+            const list = document.getElementById('adminReportsList');
+            if (window.allReports.length === 0) {
+                list.innerHTML = `<div class="p-16 text-center text-gray-500 text-xs font-mono">No active disputes or arbitration appeals.</div>`;
+                return;
+            }
+            list.innerHTML = "";
+            window.allReports.forEach(r => {
+                const hasAppeal = !!r.appealNotes;
+                list.innerHTML += `
+                    <div class="glass-panel p-6 rounded-3xl border-brand-pink/30 space-y-4">
+                        <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
+                            <div class="flex items-center gap-2">
+                                <span class="bg-brand-pink text-white font-bold px-2 py-0.5 rounded text-[9px] uppercase tracking-widest">${r.reason || 'Dispute'}</span>
+                                <span class="text-[9px] text-gray-500 font-mono">Case: ${r.id}</span>
+                                <span class="text-[9px] bg-white/10 px-2 py-0.5 rounded font-mono text-brand-gold font-bold">${r.status || 'Under Review'}</span>
+                            </div>
+                            <span class="text-xs text-gray-400 font-mono">Target Seller: ${r.targetSeller?.substring(0,10)}</span>
+                        </div>
+
+                        <div class="bg-black/50 p-4 rounded-xl border border-white/5 space-y-2">
+                            <p class="text-xs font-bold text-gray-300">Buyer Claim:</p>
+                            <p class="text-xs text-gray-400 leading-relaxed">${r.details || r.message || 'No statement'}</p>
+                        </div>
+
+                        ${hasAppeal ? `
+                            <div class="bg-green-500/10 p-4 rounded-xl border border-green-500/20 space-y-2">
+                                <p class="text-xs font-bold text-green-400"><i class="fa-brands fa-whatsapp mr-1"></i> Vendor Appeal Statement:</p>
+                                <p class="text-xs text-gray-200 leading-relaxed font-mono">"${r.appealNotes}"</p>
+                            </div>
+                        ` : ''}
+
+                        <div class="flex justify-end gap-2 pt-2 border-t border-white/5">
+                            <button onclick="window.resolveReport('${r.id}', 'Resolved - Buyer Upheld')" class="bg-brand-pink text-white px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider">Refund Buyer</button>
+                            <button onclick="window.resolveReport('${r.id}', 'Resolved - Vendor Upheld')" class="bg-brand-emerald text-black px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider">Uphold Vendor</button>
+                        </div>
+                    </div>
+                `;
+            });
+        };
+
+        window.resolveReport = async function(reportId, resolution) {
+            try {
+                await updateDoc(doc(db, "reports", reportId), {
+                    status: resolution,
+                    resolvedAt: serverTimestamp()
+                });
+                window.showAlert("Case Closed", `Case ${reportId} marked as '${resolution}'.`);
+            } catch(e) { window.showAlert("Error", e.message); }
+        };
+
+        // --- BANK REQUESTS ---
+        window.renderBanks = function() {
+            const list = document.getElementById('bankRequestsList');
+            if (window.allBanks.length === 0) {
+                list.innerHTML = `<div class="p-12 text-center text-gray-500 text-xs">No pending bank requests.</div>`;
+                return;
+            }
+            list.innerHTML = "";
+            window.allBanks.forEach(b => {
+                list.innerHTML += `
+                    <div class="p-4 bg-black/40 rounded-xl border border-white/5 flex items-center justify-between">
+                        <div>
+                            <span class="font-bold text-white text-sm block">${b.bankName}</span>
+                            <span class="text-[10px] text-gray-500 font-mono">Requested by: ${b.vendorId?.substring(0,8)}</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="window.updateBankStatus('${b.id}', 'Approved')" class="bg-brand-emerald text-black px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider">Approve</button>
+                            <button onclick="window.updateBankStatus('${b.id}', 'Rejected')" class="bg-brand-pink text-white px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider">Reject</button>
+                        </div>
+                    </div>
+                `;
+            });
+        };
+
+        window.updateBankStatus = async function(id, status) {
+            try {
+                await updateDoc(doc(db, "bank_requests", id), { status });
+                window.showAlert("Bank Request", `Bank request status updated to '${status}'.`);
+            } catch(e) { window.showAlert("Error", e.message); }
+        };
+
+        // --- GLOBAL ANNOUNCEMENT ---
+        window.saveGlobalAnnouncement = async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('saveAnnBtn');
+            btn.innerText = "Broadcasting..."; btn.disabled = true;
+            const msg = document.getElementById('announcementText').value.trim();
+
+            try {
+                await setDoc(doc(db, "admin_settings", "global_announcement"), {
+                    message: msg,
+                    updatedAt: serverTimestamp()
+                });
+                window.showAlert("Broadcast Dispatched", "Global marquee message updated live across all portal headers.");
+            } catch(e) { window.showAlert("Broadcast Error", e.message); }
+            finally { btn.innerText = "Broadcast to All Portals"; btn.disabled = false; }
+        };
+    </script>
+</body>
+</html>
