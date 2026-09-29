@@ -1,43 +1,89 @@
-# Implementation Plan: Direct Update & Full Restoration of Vendor.html and Order.html
+# Revised Master Implementation Plan: Vendor Deployment Merge & Multi-Device Functional Integrity
 
-## 1. Goal
-Directly update and restore `Vendor.html` and `Order.html` using official file write tools so that all 4 primary application files (`Admin.html`, `Hub.html`, `Vendor.html`, and `Order.html`) are confirmed edited, completely synchronized, and verified in the build system.
+## Executive Summary
+This revised plan unites the **Vendor.html Deployment Page Merge** with the **36 Mobile, Desktop, Realtime Chat & Functional Requirements** across all four portal pages (`Vendor.html`, `Order.html`, `Admin.html`, and `Hub.html`).
 
----
-
-## 2. Page-Specific Preservation & Enhancement
-
-### A. `Vendor.html` (Full Restoration & Direct Update)
-- **100% Content Retention**:
-  - Security gate with vendor verification.
-  - Financial summary cards (`bal-pending`, `bal-processing`, `bal-cleared`, `bal-total`).
-  - 18% fee payout modal (`initiateWithdrawalModal`, `processFinalWithdrawal`) with 4-digit PIN verification.
-  - Full Deploy to Marketplace form (`#view-upload`) supporting V1, V2, V3, and V4 delivery models.
-  - Multi-type deliverable inputs (files, images, links, text credentials) with device file picker.
-  - My Uploads grid (`#view-listings`) with edit DB, view on Hub, and copy PID.
-  - Customer Orders (`#view-orders`) with physical dispatch modal (`#v3DeliveryModal`) and deliverable release modal (`#v2DeliveryModal`).
-  - Profile & Settings (`#view-settings`): Profile bio, bank selector with bank addition request modal (`#requestBankModal`), and security PIN setup.
-  - Withdrawal Ledger (`#view-history`): Active applications tracking, historical payouts table, duration calculation, and digital receipt downloads (JPG and PDF).
-  - Buyer Communications (`#view-chats`): Full WhatsApp clone chat UI with buyer contacts list, real-time message stream, typing indicators, replies, image attachments, buyer reporting, and chat PDF export.
-- **Critical Chat ID Synchronization**:
-  - Ensure deterministic chat ID construction: `[uid1, uid2].sort().join('_') + '_' + orderId` so buyer and seller communicate on the exact same thread.
+**Guiding Law**:
+- **MERGE, NEVER REPLACE**: 100% of original visual identity, layout, colors, buttons, fields, functions, event listeners, and Firestore schemas are preserved.
+- **NO FEATURE HIDING**: Responsive improvements adapt widths, wrapping, and scrolling rather than using `display: none` to strip controls.
+- **FULL FUNCTIONAL REALTIME CHAT**: Bidirectional Firestore persistence with normalized IDs, true presence, debounced typing feedback, and mobile keyboard resilience.
 
 ---
 
-### B. `Order.html` (Full Restoration & Direct Update)
-- **100% Content Retention**:
-  - Sidebar navigation.
-  - Active Orders (`#view-orders`): Status badges, order tracking, Direct Comm button.
-  - Digital Asset Vault (`#view-purchases`): Decoupled display where items with deliverables appear immediately upon dispatch/release. Multi-type rendering (credentials with copy button, documents with download, links with visit, images with preview). Direct dispute button on vault cards.
-  - Idempotent Delivery Confirmation (`#confirmDeliveryModal`): Guard against duplicate clicks, update status to `Received`, move order amount from vendor `processingBalance` to `withdrawableBalance` and increment `totalEarned`.
-  - Payment Ledger (`#view-history`): Historical records and official branded PDF receipts (`downloadOrderReceipt`).
-  - Activity Alerts (`#view-notifications`): Real-time network alerts.
-  - Network Directory search modal (`#networkSearchModal`): Opponent node lookup and live listings.
-  - Refund Dispute modal (`#refundModal`) and Report Seller modal (`#reportModal`).
-  - Vendor Communications (`#view-chats`): Full WhatsApp clone chat UI synchronized with `Vendor.html` via `[uid1, uid2].sort().join('_') + '_' + orderId`, with real presence, typing indicators, replies, image attachments, and PDF export.
+## 1. Vendor Deployment Page Merge (`Vendor.html` & `vendor.html`)
+
+### A. Global Physical Baseline Panel
+Merged into `#view-upload` when `Listing Type == PHYSICAL` or `deliveryModel` is `V3` / `V4`:
+1. **Item Condition**:
+   - `Brand New`, `Like New / Open Box`, `Refurbished`, `Used (Good)`, `Used (Fair)`, `For Parts / Repair`.
+2. **Package Weight & Unit**:
+   - Weight number input with unit selector (`kg`, `g`, `lbs`).
+3. **Package Dimensions**:
+   - Length, Width, Height with unit selector (`cm`, `inches`).
+4. **Fulfillment / Shipping Options**:
+   - `Standard Shipping`, `Express Shipping`, `Local Pickup / Workshop Pickup`, plus V4 custom shipping fee field.
+
+### B. 5 Dynamic Physical Subcategory Engines
+Dynamic subcategory selector seamlessly activates the required metadata module without reloading the page or clearing shared global fields (Title, Price, Stock, Description, Photos, Delivery Model, WhatsApp):
+1. **`SUB_ELECTRONICS_MOBILE`** (Mobile Devices, Tablets & Consumer Electronics):
+   - Brand: Apple, Samsung, Xiaomi, Tecno, Infinix, Huawei, Lenovo, Sony, Google, OnePlus, Oppo, Vivo, Custom/Generic.
+   - Model Name/Number, Storage Capacity, RAM Size, Display Size, Battery Health/Capacity, Network Lock Status, Included Accessories, IMEI/Serial.
+2. **`SUB_PARTS_HARDWARE`** (Hardware, Spare Parts & Repair Components):
+   - Device Compatibility, Part Category (Screen, Battery, Motherboard, Camera, Housing, Flex, etc.), Quality Grade (OEM Pull, Premium Aftermarket, Refurbished Genuine, Grade A), Testing Condition, Warranty Period.
+3. **`SUB_SOLAR_POWER`** (Solar & Power Equipment):
+   - Equipment Category (Panels, Inverters, Lithium Batteries, Charge Controllers, Solar Kits), Power Output, Voltage (12V, 24V, 48V, High Voltage), Battery Chemistry (LiFePO4, Gel, Tubular), Protection Features.
+4. **`SUB_FASHION_APPAREL`** (Fashion, Apparel & Wearables):
+   - Target Audience (Men, Women, Unisex, Kids), Size Matrix, Color, Material/Fabric, Fit Type.
+5. **`SUB_GENERAL_TOOLS`** (General Merchandise & Tools):
+   - Tool Category, Power Source (Cordless, AC 220V, Manual, Pneumatic), Tool Grade (Industrial, DIY, Commercial).
+
+### C. 100 Real, Verified AI Systems Catalog
+Expand the AI assistant/subscription selection into a searchable datalist containing 100 genuine, widely used AI models, tools, and platforms:
+- **LLMs & Assistants**: ChatGPT, GPT-4o, Claude 3.5 Sonnet, Claude 3 Opus, Gemini 1.5 Pro, Gemini 1.5 Flash, Copilot, Perplexity AI, Grok, DeepSeek V2, Llama 3, Mistral Large, Mixtral 8x22B, Command R+, Qwen 2, Pi, Ernie Bot, etc.
+- **Code & Dev**: GitHub Copilot, Cursor AI, Supermaven, Claude Dev, Tabnine, Codeium, Replit Ghostwriter, Amazon Q, v0 by Vercel, Bolt.new, Lovable, Continue.dev, Devin AI, Aider, OpenHands.
+- **Image & Design**: Midjourney, DALL-E 3, Stable Diffusion XL, Flux.1, Adobe Firefly, Ideogram, Recraft AI, Leonardo.ai, Playground AI, Canva Magic, Magnific AI, Krea AI, Photoroom.
+- **Video & Animation**: Runway Gen-3 Alpha, Luma Dream Machine, Kling AI, Pika Labs, OpenAI Sora, Haiper AI, Kaiber, Synthesia, HeyGen, D-ID, InVideo AI, Vidu AI.
+- **Audio & Music**: ElevenLabs, Suno AI, Udio, Whisper, Murf.ai, Speechify, Descript, Stable Audio, Play.ht, Resemble AI.
+- **Research & Productivity**: NotebookLM, Perplexity Pages, Consensus, Elicit, Scite.ai, Jasper AI, Copy.ai, Writesonic, Grammarly AI, Notion AI, Julius AI, Otter.ai, Fireflies.ai.
+- **Platforms & Frameworks**: Hugging Face, Ollama, vLLM, LangChain, LlamaIndex, Pinecone, Weaviate, Together AI, Groq, Fireworks AI.
+
+### D. Non-Destructive Create & Update Flow
+- **Create**: Generates unique PID (`PID-XXXXXX-VFA`), collects global and active dynamic metadata, and creates listing with status `pending`.
+- **Edit/Update**: `openFullEditListing(docId)` reads existing document, populates global and dynamic subcategory fields, sets `window.editingListingId = docId`, and `pushToDatabase()` commits via `updateDoc` without erasing unedited properties.
 
 ---
 
-## 3. Verification & Compilation
-- Run `compile_applet` and `lint_applet` to confirm zero syntax or build errors.
-- Confirm both `Vendor.html` and `Order.html` are recorded as updated in the environment history.
+## 2. Multi-Device Usability & Realtime Chat Across All Portals
+
+### A. Realtime Chat System Integrity
+- **Deterministic ID Formula**:
+  `const chatId = [window.currentUser.uid, otherUserId].sort().join('_') + '_' + orderId;`
+  Enforced symmetrically in `Order.html` and `Vendor.html`.
+- **Message Sending & Delivery**: Writes to `chats/${chatId}/messages` and updates parent `chats/${chatId}` with `lastMessage` and `lastMessageTime`.
+- **Realtime Listeners**: Query ordered by `createdAt asc`. Incoming messages append instantly without reload and persist after refresh.
+- **True Presence & Typing Indicators**: Real Firestore `lastOnline` heartbeat (< 120s) and debounced `typing_${uid}` flags in chat headers.
+
+### B. Mobile Keyboard & Touch Controls
+- **Keyboard Protection**: Chat input fixed with `sticky bottom-0 z-20 flex-shrink-0 bg-[#F0F2F5]` (or `#0A0D14`), preventing off-screen occlusion when virtual keyboards open.
+- **Touch Targets**: All buttons, send actions, and links have minimum touch areas $\ge 44\text{px} \times 44\text{px}$.
+- **Horizontal Overflow Protection**: Data tables in `Admin.html`, `Order.html`, and `Vendor.html` wrapped in touch-scrollable containers (`overflow-x-auto -webkit-overflow-scrolling: touch`) preventing page-level layout breakage.
+- **Modal Viewport Safety**: All modal bodies styled with `max-h-[90dvh] overflow-y-auto` so controls remain reachable on small phone screens.
+
+---
+
+## 3. Step-by-Step Implementation Sequence
+
+1. **Step 1 — Update `Vendor.html`**:
+   - Merge global physical fields (Condition, Weight, Dimensions, Fulfillment) into `#view-upload`.
+   - Add the 5 dynamic physical subcategory panels and dynamic switcher.
+   - Expand AI subscription datalist to 100 verified AI systems.
+   - Enhance `openFullEditListing` and `pushToDatabase` for complete non-destructive edit/update.
+   - Sync updates to `vendor.html`.
+2. **Step 2 — Verify `Order.html` & `order.html`**:
+   - Confirm safe-area mobile chat input, typing listener/emitter, decoupled vault deliverables, and idempotent delivery confirmation.
+3. **Step 3 — Verify `Admin.html` & `admin.html`**:
+   - Confirm table horizontal touch scrolling, modal height containment, and touch targets.
+4. **Step 4 — Verify `Hub.html` & `hub.html`**:
+   - Confirm Super Admin link exclusion and `?query=` search hydration.
+5. **Step 5 — Verification & Build**:
+   - Run `compile_applet` and `lint_applet` to confirm 100% build health.

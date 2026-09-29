@@ -147,7 +147,7 @@
     </div>
 
     <div id="withdrawalModal" class="overlay-mask fixed inset-0 flex items-center justify-center p-4 z-[250]">
-        <div class="glass-panel p-6 sm:p-8 rounded-3xl w-full max-w-md transform transition-all duration-300 relative border-brand-emerald/40 shadow-[0_0_40px_rgba(0,255,157,0.1)]">
+        <div class="glass-panel p-6 sm:p-8 rounded-3xl w-full max-w-md max-h-[90dvh] overflow-y-auto custom-scrollbar transform transition-all duration-300 relative border-brand-emerald/40 shadow-[0_0_40px_rgba(0,255,157,0.1)]">
             <h3 class="text-2xl font-black text-white mb-1"><i class="fa-solid fa-money-bill-transfer text-brand-emerald mr-2"></i> Execute Payout</h3>
             <p class="text-[10px] text-gray-400 uppercase tracking-widest mb-6 border-b border-white/10 pb-4">Standard 18% Fee Structure Applied</p>
 
@@ -180,7 +180,7 @@
 
             <div class="bg-black/50 p-4 rounded-xl border border-white/5 mb-6">
                 <label class="block text-[10px] font-bold text-brand-gold uppercase tracking-widest mb-2">4-Digit Security PIN</label>
-                <input type="password" id="wdPin" maxlength="4" pattern="[0-9]{4}" class="admin-input w-full p-4 rounded-xl text-center text-2xl tracking-[1em] font-black font-mono text-brand-gold focus:border-brand-gold" placeholder="••••" required autocomplete="off">
+                <input type="password" id="wdPin" maxlength="4" pattern="[0-9]{4}" inputmode="numeric" class="admin-input w-full p-4 rounded-xl text-center text-2xl tracking-[1em] font-black font-mono text-brand-gold focus:border-brand-gold" placeholder="••••" required autocomplete="off">
                 <p class="text-[9px] text-gray-500 mt-2 text-center">Enter your secure withdrawal PIN to authorize this transfer.</p>
             </div>
 
@@ -192,7 +192,7 @@
     </div>
 
     <div id="v3DeliveryModal" class="overlay-mask fixed inset-0 flex items-center justify-center p-4 z-[250]">
-        <div class="glass-panel p-8 rounded-3xl w-full max-w-md transform transition-all duration-300 relative border-yellow-500/40 shadow-[0_0_40px_rgba(234,179,8,0.1)]">
+        <div class="glass-panel p-8 rounded-3xl w-full max-w-md max-h-[90dvh] overflow-y-auto custom-scrollbar transform transition-all duration-300 relative border-yellow-500/40 shadow-[0_0_40px_rgba(234,179,8,0.1)]">
             <div class="w-14 h-14 rounded-full bg-yellow-500/10 flex items-center justify-center mb-6 border border-yellow-500/30">
                 <i class="fa-solid fa-truck-fast text-2xl text-yellow-500 animate-pulse"></i>
             </div>
@@ -214,7 +214,7 @@
     </div>
 
     <div id="v2DeliveryModal" class="overlay-mask fixed inset-0 flex items-center justify-center p-4 z-[250]">
-        <div class="glass-panel p-8 rounded-3xl w-full max-w-md transform transition-all duration-300 relative border-brand-accent/40 shadow-[0_0_40px_rgba(0,229,255,0.1)]">
+        <div class="glass-panel p-8 rounded-3xl w-full max-w-md max-h-[90dvh] overflow-y-auto custom-scrollbar transform transition-all duration-300 relative border-brand-accent/40 shadow-[0_0_40px_rgba(0,229,255,0.1)]">
             <h3 class="text-xl font-black text-white mb-2"><i class="fa-solid fa-cloud-arrow-up text-brand-accent mr-2"></i> Release Deliverable</h3>
             <p class="text-xs text-gray-400 mb-6">Provide the link, access code, or final text to release the order. The buyer must confirm receipt before funds are cleared.</p>
 
@@ -501,24 +501,328 @@
                         </div>
 
                         <div id="info_physical" class="dynamic-info-section hidden space-y-6">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div class="relative">
-                                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3 font-display">Item Condition</label>
-                                    <select id="db_physCondition" class="admin-input appearance-none w-full px-5 py-4 rounded-xl text-sm">
-                                        <option value="Brand New">Brand New</option>
-                                        <option value="Used - Like New">Used - Like New</option>
-                                        <option value="Used - Fair">Used - Fair</option>
-                                    </select>
-                                    <i class="fa-solid fa-chevron-down absolute right-5 top-[60%] -translate-y-1/2 text-gray-500 text-xs pointer-events-none"></i>
+                            <!-- Global Physical Baseline Fields -->
+                            <div class="bg-black/30 p-5 rounded-2xl border border-white/5 space-y-5">
+                                <h5 class="text-xs font-bold text-brand-gold uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-box"></i> Physical Logistics & Baseline</h5>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div class="relative">
+                                        <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 font-display">Item Condition</label>
+                                        <select id="db_physCondition" class="admin-input appearance-none w-full px-5 py-3.5 rounded-xl text-sm">
+                                            <option value="Brand New">Brand New</option>
+                                            <option value="Like New / Open Box">Like New / Open Box</option>
+                                            <option value="Refurbished">Refurbished</option>
+                                            <option value="Used (Good)">Used (Good)</option>
+                                            <option value="Used (Fair)">Used (Fair)</option>
+                                            <option value="For Parts / Repair">For Parts / Repair</option>
+                                        </select>
+                                        <i class="fa-solid fa-chevron-down absolute right-5 top-[60%] -translate-y-1/2 text-gray-500 text-xs pointer-events-none"></i>
+                                    </div>
+                                    <div class="relative">
+                                        <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 font-display">Fulfillment / Shipping</label>
+                                        <select id="db_physDelivery" class="admin-input appearance-none w-full px-5 py-3.5 rounded-xl text-sm">
+                                            <option value="Standard Shipping">Standard Shipping</option>
+                                            <option value="Express Shipping">Express Shipping</option>
+                                            <option value="Local Pickup / Workshop Pickup">Local Pickup / Workshop Pickup</option>
+                                            <option value="Delivery & Pickup Available">Delivery & Pickup Available</option>
+                                            <option value="Delivery Only">Delivery Only</option>
+                                            <option value="Pickup Only">Pickup Only</option>
+                                        </select>
+                                        <i class="fa-solid fa-chevron-down absolute right-5 top-[60%] -translate-y-1/2 text-gray-500 text-xs pointer-events-none"></i>
+                                    </div>
                                 </div>
-                                <div class="relative">
-                                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3 font-display">Delivery Availability</label>
-                                    <select id="db_physDelivery" class="admin-input appearance-none w-full px-5 py-4 rounded-xl text-sm">
-                                        <option value="Delivery & Pickup">Delivery & Pickup Available</option>
-                                        <option value="Delivery Only">Delivery Only</option>
-                                        <option value="Pickup Only">Pickup Only</option>
-                                    </select>
-                                    <i class="fa-solid fa-chevron-down absolute right-5 top-[60%] -translate-y-1/2 text-gray-500 text-xs pointer-events-none"></i>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 font-display">Package Weight</label>
+                                        <div class="flex gap-2">
+                                            <input type="number" step="0.01" id="db_physWeight" class="admin-input flex-1 px-4 py-3 rounded-xl text-sm" placeholder="e.g. 1.5">
+                                            <select id="db_physWeightUnit" class="admin-input px-3 py-3 rounded-xl text-xs font-bold text-brand-gold w-20">
+                                                <option value="kg">kg</option>
+                                                <option value="g">g</option>
+                                                <option value="lbs">lbs</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 font-display">Package Dimensions (L × W × H)</label>
+                                        <div class="flex gap-2 items-center">
+                                            <input type="number" step="0.1" id="db_physDimL" class="admin-input flex-1 px-2 py-3 rounded-xl text-center text-xs" placeholder="L">
+                                            <span class="text-gray-500">×</span>
+                                            <input type="number" step="0.1" id="db_physDimW" class="admin-input flex-1 px-2 py-3 rounded-xl text-center text-xs" placeholder="W">
+                                            <span class="text-gray-500">×</span>
+                                            <input type="number" step="0.1" id="db_physDimH" class="admin-input flex-1 px-2 py-3 rounded-xl text-center text-xs" placeholder="H">
+                                            <select id="db_physDimUnit" class="admin-input px-2 py-3 rounded-xl text-xs font-bold text-brand-gold w-16">
+                                                <option value="cm">cm</option>
+                                                <option value="in">in</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 1. Mobile Devices & Consumer Electronics -->
+                            <div id="panel_SUB_ELECTRONICS_MOBILE" class="phys-sub-panel hidden space-y-4 bg-blue-500/5 p-5 rounded-2xl border border-blue-500/20">
+                                <h5 class="text-xs font-bold text-blue-400 uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-mobile-screen"></i> Mobile Devices & Electronics Metadata</h5>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    <div>
+                                        <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Brand / Manufacturer</label>
+                                        <select id="db_mobileBrand" class="admin-input w-full px-4 py-3 rounded-xl text-xs">
+                                            <option value="Apple">Apple</option>
+                                            <option value="Samsung">Samsung</option>
+                                            <option value="Xiaomi">Xiaomi</option>
+                                            <option value="Tecno">Tecno</option>
+                                            <option value="Infinix">Infinix</option>
+                                            <option value="Huawei">Huawei</option>
+                                            <option value="Lenovo">Lenovo</option>
+                                            <option value="Sony">Sony</option>
+                                            <option value="Google">Google Pixel</option>
+                                            <option value="OnePlus">OnePlus</option>
+                                            <option value="Oppo">Oppo</option>
+                                            <option value="Vivo">Vivo</option>
+                                            <option value="Custom / Generic">Custom / Generic</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Model Name / Number</label>
+                                        <input type="text" id="db_mobileModel" class="admin-input w-full px-4 py-3 rounded-xl text-xs" placeholder="e.g. iPhone 15 Pro Max">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Storage Capacity</label>
+                                        <select id="db_mobileStorage" class="admin-input w-full px-4 py-3 rounded-xl text-xs">
+                                            <option value="32GB">32GB</option>
+                                            <option value="64GB">64GB</option>
+                                            <option value="128GB">128GB</option>
+                                            <option value="256GB">256GB</option>
+                                            <option value="512GB">512GB</option>
+                                            <option value="1TB">1TB</option>
+                                            <option value="2TB">2TB</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">RAM Size</label>
+                                        <select id="db_mobileRam" class="admin-input w-full px-4 py-3 rounded-xl text-xs">
+                                            <option value="2GB">2GB</option>
+                                            <option value="3GB">3GB</option>
+                                            <option value="4GB">4GB</option>
+                                            <option value="6GB">6GB</option>
+                                            <option value="8GB">8GB</option>
+                                            <option value="12GB">12GB</option>
+                                            <option value="16GB">16GB</option>
+                                            <option value="32GB+">32GB+</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Display / Screen Size</label>
+                                        <input type="text" id="db_mobileScreen" class="admin-input w-full px-4 py-3 rounded-xl text-xs" placeholder="e.g. 6.7 inches">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Battery Health / Capacity</label>
+                                        <input type="text" id="db_mobileBattery" class="admin-input w-full px-4 py-3 rounded-xl text-xs" placeholder="e.g. 100% or 5000 mAh">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Network Lock Status</label>
+                                        <select id="db_mobileLock" class="admin-input w-full px-4 py-3 rounded-xl text-xs">
+                                            <option value="Factory Unlocked">Factory Unlocked</option>
+                                            <option value="Carrier Locked">Carrier Locked</option>
+                                            <option value="WiFi Only">WiFi Only</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Included Accessories</label>
+                                        <input type="text" id="db_mobileAccessories" class="admin-input w-full px-4 py-3 rounded-xl text-xs" placeholder="Box, Fast Charger, Case">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">IMEI / Serial (Optional)</label>
+                                        <input type="text" id="db_mobileSerial" class="admin-input w-full px-4 py-3 rounded-xl text-xs font-mono" placeholder="Reference ID">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 2. Hardware, Spare Parts & Components -->
+                            <div id="panel_SUB_PARTS_HARDWARE" class="phys-sub-panel hidden space-y-4 bg-orange-500/5 p-5 rounded-2xl border border-orange-500/20">
+                                <h5 class="text-xs font-bold text-orange-400 uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-microchip"></i> Hardware & Components Metadata</h5>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    <div>
+                                        <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Target Device Compatibility</label>
+                                        <input type="text" id="db_hardwareCompat" class="admin-input w-full px-4 py-3 rounded-xl text-xs" placeholder="e.g. iPhone 13 Pro, HP EliteBook">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Component Category</label>
+                                        <select id="db_hardwareCategory" class="admin-input w-full px-4 py-3 rounded-xl text-xs">
+                                            <option value="Screen / Display Assembly">Screen / Display Assembly</option>
+                                            <option value="Battery Replacement">Battery Replacement</option>
+                                            <option value="Motherboard / Logic Board">Motherboard / Logic Board</option>
+                                            <option value="Charging Port / Flex">Charging Port / Flex</option>
+                                            <option value="Camera Module">Camera Module</option>
+                                            <option value="Housing / Back Glass">Housing / Back Glass</option>
+                                            <option value="Keyboard / Trackpad">Keyboard / Trackpad</option>
+                                            <option value="RAM / SSD Storage">RAM / SSD Storage</option>
+                                            <option value="Flex Cables / Ribbon">Flex Cables / Ribbon</option>
+                                            <option value="Other Component">Other Component</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Quality / Origin Grade</label>
+                                        <select id="db_hardwareGrade" class="admin-input w-full px-4 py-3 rounded-xl text-xs">
+                                            <option value="Original OEM Pull">Original OEM Pull</option>
+                                            <option value="Premium Aftermarket">Premium Aftermarket</option>
+                                            <option value="Refurbished Genuine">Refurbished Genuine</option>
+                                            <option value="Grade A Copy">Grade A Copy</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Testing & Condition</label>
+                                        <select id="db_hardwareTesting" class="admin-input w-full px-4 py-3 rounded-xl text-xs">
+                                            <option value="100% Tested Working">100% Tested Working</option>
+                                            <option value="New Untested">New Untested</option>
+                                            <option value="Minor Repair Needed">Minor Repair Needed</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Warranty Period</label>
+                                        <select id="db_hardwareWarranty" class="admin-input w-full px-4 py-3 rounded-xl text-xs">
+                                            <option value="No Warranty">No Warranty</option>
+                                            <option value="7 Days Testing Warranty">7 Days Testing Warranty</option>
+                                            <option value="30 Days Warranty">30 Days Warranty</option>
+                                            <option value="3 Months Warranty">3 Months Warranty</option>
+                                            <option value="6 Months Warranty">6 Months Warranty</option>
+                                            <option value="1 Year Warranty">1 Year Warranty</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 3. Solar & Power Equipment -->
+                            <div id="panel_SUB_SOLAR_POWER" class="phys-sub-panel hidden space-y-4 bg-yellow-500/5 p-5 rounded-2xl border border-yellow-500/20">
+                                <h5 class="text-xs font-bold text-yellow-400 uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-solar-panel"></i> Solar & Power Equipment Metadata</h5>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    <div>
+                                        <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Equipment Category</label>
+                                        <select id="db_solarCategory" class="admin-input w-full px-4 py-3 rounded-xl text-xs">
+                                            <option value="Monocrystalline Solar Panels">Monocrystalline Solar Panels</option>
+                                            <option value="Polycrystalline Solar Panels">Polycrystalline Solar Panels</option>
+                                            <option value="Pure Sine Wave Inverters">Pure Sine Wave Inverters</option>
+                                            <option value="Hybrid Inverters">Hybrid Inverters</option>
+                                            <option value="Lithium LiFePO4 Batteries">Lithium LiFePO4 Batteries</option>
+                                            <option value="Tubular Deep Cycle Batteries">Tubular Deep Cycle Batteries</option>
+                                            <option value="Gel Deep Cycle Batteries">Gel Deep Cycle Batteries</option>
+                                            <option value="MPPT Charge Controllers">MPPT Charge Controllers</option>
+                                            <option value="PWM Charge Controllers">PWM Charge Controllers</option>
+                                            <option value="Complete Solar Kits">Complete Solar Kits</option>
+                                            <option value="Solar Accessories & Cables">Solar Accessories & Cables</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Power Output / Capacity</label>
+                                        <input type="text" id="db_solarCapacity" class="admin-input w-full px-4 py-3 rounded-xl text-xs" placeholder="e.g. 550W, 3.5kVA, 5kWh, 200Ah">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Operating Voltage</label>
+                                        <select id="db_solarVoltage" class="admin-input w-full px-4 py-3 rounded-xl text-xs">
+                                            <option value="12V">12V</option>
+                                            <option value="24V">24V</option>
+                                            <option value="48V">48V</option>
+                                            <option value="High Voltage / Hybrid">High Voltage / Hybrid</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Battery Chemistry</label>
+                                        <select id="db_solarChemistry" class="admin-input w-full px-4 py-3 rounded-xl text-xs">
+                                            <option value="LiFePO4 (Lithium Iron Phosphate)">LiFePO4 (Lithium Iron Phosphate)</option>
+                                            <option value="Gel Deep Cycle">Gel Deep Cycle</option>
+                                            <option value="Tubular Lead-Acid">Tubular Lead-Acid</option>
+                                            <option value="AGM Sealed">AGM Sealed</option>
+                                            <option value="N/A (Panels/Inverters)">N/A (Panels/Inverters)</option>
+                                        </select>
+                                    </div>
+                                    <div class="sm:col-span-2">
+                                        <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Inbuilt Protection & Features</label>
+                                        <input type="text" id="db_solarProtection" class="admin-input w-full px-4 py-3 rounded-xl text-xs" placeholder="e.g. Pure Sine Wave, BMS, Short Circuit, IP65 Waterproof">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 4. Fashion, Apparel & Wearables -->
+                            <div id="panel_SUB_FASHION_APPAREL" class="phys-sub-panel hidden space-y-4 bg-pink-500/5 p-5 rounded-2xl border border-pink-500/20">
+                                <h5 class="text-xs font-bold text-pink-400 uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-shirt"></i> Fashion & Apparel Metadata</h5>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    <div>
+                                        <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Target Audience</label>
+                                        <select id="db_fashionGender" class="admin-input w-full px-4 py-3 rounded-xl text-xs">
+                                            <option value="Men">Men</option>
+                                            <option value="Women">Women</option>
+                                            <option value="Unisex">Unisex</option>
+                                            <option value="Kids / Teens">Kids / Teens</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Size Matrix</label>
+                                        <input type="text" id="db_fashionSize" class="admin-input w-full px-4 py-3 rounded-xl text-xs" placeholder="e.g. S, M, L, XL or EU 42">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Color</label>
+                                        <input type="text" id="db_fashionColor" class="admin-input w-full px-4 py-3 rounded-xl text-xs" placeholder="e.g. Jet Black, Navy Blue">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Material / Fabric</label>
+                                        <select id="db_fashionMaterial" class="admin-input w-full px-4 py-3 rounded-xl text-xs">
+                                            <option value="100% Pure Cotton">100% Pure Cotton</option>
+                                            <option value="Genuine Leather">Genuine Leather</option>
+                                            <option value="Polyester Blend">Polyester Blend</option>
+                                            <option value="Denim">Denim</option>
+                                            <option value="Wool / Cashmere">Wool / Cashmere</option>
+                                            <option value="Silk">Silk</option>
+                                            <option value="Synthetic Blend">Synthetic Blend</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Fit Type</label>
+                                        <select id="db_fashionFit" class="admin-input w-full px-4 py-3 rounded-xl text-xs">
+                                            <option value="Regular Fit">Regular Fit</option>
+                                            <option value="Slim Fit">Slim Fit</option>
+                                            <option value="Oversized">Oversized</option>
+                                            <option value="Relaxed Fit">Relaxed Fit</option>
+                                            <option value="Tailored / Fitted">Tailored / Fitted</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 5. General Merchandise & Tools -->
+                            <div id="panel_SUB_GENERAL_TOOLS" class="phys-sub-panel hidden space-y-4 bg-emerald-500/5 p-5 rounded-2xl border border-emerald-500/20">
+                                <h5 class="text-xs font-bold text-emerald-400 uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-wrench"></i> General Tools & Hardware Metadata</h5>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    <div>
+                                        <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Tool Category</label>
+                                        <select id="db_toolsCategory" class="admin-input w-full px-4 py-3 rounded-xl text-xs">
+                                            <option value="Power Tools (Drills, Saws, Grinders)">Power Tools (Drills, Saws, Grinders)</option>
+                                            <option value="Hand Tools (Wrenches, Screwdrivers)">Hand Tools (Wrenches, Screwdrivers)</option>
+                                            <option value="Electrical & Multimeters">Electrical & Multimeters</option>
+                                            <option value="Soldering & Rework Stations">Soldering & Rework Stations</option>
+                                            <option value="Automotive Workshop Tools">Automotive Workshop Tools</option>
+                                            <option value="Measuring & Precision">Measuring & Precision</option>
+                                            <option value="Safety & Workwear">Safety & Workwear</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Power Source</label>
+                                        <select id="db_toolsPower" class="admin-input w-full px-4 py-3 rounded-xl text-xs">
+                                            <option value="Cordless Battery (18V-20V)">Cordless Battery (18V-20V)</option>
+                                            <option value="AC Electric (220V-240V)">AC Electric (220V-240V)</option>
+                                            <option value="Manual / Mechanical">Manual / Mechanical</option>
+                                            <option value="Pneumatic (Air Powered)">Pneumatic (Air Powered)</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Tool Grade</label>
+                                        <select id="db_toolsGrade" class="admin-input w-full px-4 py-3 rounded-xl text-xs">
+                                            <option value="Industrial / Heavy Duty">Industrial / Heavy Duty</option>
+                                            <option value="Professional Tradesman">Professional Tradesman</option>
+                                            <option value="DIY / Household Grade">DIY / Household Grade</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -538,13 +842,189 @@
                         </div>
 
                         <div id="info_subscription" class="dynamic-info-section hidden space-y-6">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div><label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Tier Type</label><input type="text" id="db_subPlanType" class="admin-input w-full px-5 py-4 rounded-xl" placeholder="e.g. Plus, Premium"></div>
-                                <div class="relative"><label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Duration</label>
-                                    <select id="db_subDuration" class="admin-input appearance-none w-full px-5 py-4 rounded-xl">
-                                        <option value="1 Month">1 Month</option><option value="3 Months">3 Months</option><option value="1 Year">1 Year</option><option value="Lifetime Access">Lifetime Access</option>
+                            <div class="bg-black/30 p-5 rounded-2xl border border-white/5 space-y-5">
+                                <h5 class="text-xs font-bold text-brand-purple uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-repeat"></i> Subscription Architecture</h5>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div class="relative">
+                                        <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 font-display">Subscription Category</label>
+                                        <select id="db_subType" onchange="window.handleSubscriptionTypeSwitch()" class="admin-input appearance-none w-full px-5 py-3.5 rounded-xl text-sm">
+                                            <option value="AI_SUBSCRIPTION">AI Assistant / LLM / Creative AI</option>
+                                            <option value="TV_STREAMING">TV & Streaming</option>
+                                            <option value="DATA_INTERNET">Data & Internet</option>
+                                            <option value="OTHERS">Custom Subscription</option>
+                                        </select>
+                                        <i class="fa-solid fa-chevron-down absolute right-5 top-[60%] -translate-y-1/2 text-gray-500 text-xs pointer-events-none"></i>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 font-display">Subscription Plan Title</label>
+                                        <input type="text" id="db_subDisplayTitle" class="admin-input w-full px-5 py-3.5 rounded-xl text-sm font-bold text-brand-purple" placeholder="Auto-populated or custom name">
+                                    </div>
+                                </div>
+
+                                <!-- AI Selection Panel with 100 Real AI Systems Datalist -->
+                                <div id="sub_ai_panel" class="space-y-2">
+                                    <label class="block text-[10px] font-bold text-brand-accent uppercase tracking-widest font-display">Select or Search AI System (Catalog of 100 Verified AI Models)</label>
+                                    <input list="realAiCatalog" id="db_aiSelect" onchange="window.syncAiSelectionToName()" class="admin-input w-full px-5 py-3.5 rounded-xl text-sm font-bold text-white border-brand-accent/40 focus:border-brand-accent" placeholder="Type to search e.g. ChatGPT, Claude, Midjourney, Cursor...">
+                                    <datalist id="realAiCatalog">
+                                        <!-- 1. General LLMs & Chat Assistants (1-20) -->
+                                        <option value="ChatGPT">ChatGPT (OpenAI)</option>
+                                        <option value="GPT-4o">GPT-4o Omnimodal</option>
+                                        <option value="GPT-4o mini">GPT-4o mini</option>
+                                        <option value="Claude 3.5 Sonnet">Claude 3.5 Sonnet (Anthropic)</option>
+                                        <option value="Claude 3 Opus">Claude 3 Opus</option>
+                                        <option value="Claude 3 Haiku">Claude 3 Haiku</option>
+                                        <option value="Gemini 1.5 Pro">Gemini 1.5 Pro (Google)</option>
+                                        <option value="Gemini 1.5 Flash">Gemini 1.5 Flash (Google)</option>
+                                        <option value="Gemini Advanced">Gemini Advanced</option>
+                                        <option value="Microsoft Copilot">Microsoft Copilot</option>
+                                        <option value="Perplexity AI">Perplexity AI</option>
+                                        <option value="Perplexity Pro">Perplexity Pro</option>
+                                        <option value="Grok">Grok 2 (xAI)</option>
+                                        <option value="DeepSeek V2">DeepSeek V2.5</option>
+                                        <option value="Meta Llama 3.1">Meta Llama 3.1 (405B/70B)</option>
+                                        <option value="Mistral Large">Mistral Large 2</option>
+                                        <option value="Mixtral 8x22B">Mixtral 8x22B</option>
+                                        <option value="Command R+">Command R+ (Cohere)</option>
+                                        <option value="Qwen 2.5">Qwen 2.5 (Alibaba)</option>
+                                        <option value="Pi">Pi (Inflection AI)</option>
+                                        <!-- 2. Developer & Code Assistants (21-40) -->
+                                        <option value="GitHub Copilot">GitHub Copilot</option>
+                                        <option value="Cursor AI">Cursor AI IDE</option>
+                                        <option value="Supermaven">Supermaven</option>
+                                        <option value="Claude Dev">Claude Dev (Cline)</option>
+                                        <option value="Tabnine">Tabnine</option>
+                                        <option value="Codeium">Codeium / Windsurf</option>
+                                        <option value="Replit Agent">Replit Agent</option>
+                                        <option value="Amazon Q Developer">Amazon Q Developer</option>
+                                        <option value="Sourcegraph Cody">Sourcegraph Cody</option>
+                                        <option value="v0 by Vercel">v0 by Vercel</option>
+                                        <option value="Bolt.new">Bolt.new (StackBlitz)</option>
+                                        <option value="Lovable">Lovable AI</option>
+                                        <option value="Continue.dev">Continue.dev</option>
+                                        <option value="Devin AI">Devin AI (Cognition)</option>
+                                        <option value="Aider">Aider Pair Programmer</option>
+                                        <option value="OpenHands">OpenHands (OpenDevin)</option>
+                                        <option value="Sweep AI">Sweep AI</option>
+                                        <option value="Blackbox AI">Blackbox AI</option>
+                                        <option value="Phind">Phind AI Search</option>
+                                        <option value="Augment Code">Augment Code</option>
+                                        <!-- 3. Image Generation & Visual AI (41-60) -->
+                                        <option value="Midjourney v6">Midjourney v6.1</option>
+                                        <option value="DALL-E 3">DALL-E 3 (OpenAI)</option>
+                                        <option value="Stable Diffusion 3">Stable Diffusion 3.5</option>
+                                        <option value="Flux.1">Flux.1 (Black Forest Labs)</option>
+                                        <option value="Adobe Firefly">Adobe Firefly 3</option>
+                                        <option value="Ideogram 2.0">Ideogram 2.0</option>
+                                        <option value="Recraft AI">Recraft AI</option>
+                                        <option value="Leonardo.ai">Leonardo.ai</option>
+                                        <option value="Playground AI">Playground AI</option>
+                                        <option value="Canva Magic Media">Canva Magic Media</option>
+                                        <option value="Magnific AI">Magnific AI Upscaler</option>
+                                        <option value="Krea AI">Krea AI Realtime</option>
+                                        <option value="Photoroom AI">Photoroom AI</option>
+                                        <option value="Topaz Photo AI">Topaz Photo AI</option>
+                                        <option value="Scenario AI">Scenario AI</option>
+                                        <option value="Getimg.ai">Getimg.ai</option>
+                                        <option value="Artbreeder">Artbreeder</option>
+                                        <option value="Clipdrop">Clipdrop (Jasper)</option>
+                                        <option value="Civitai">Civitai Models</option>
+                                        <option value="Vectorizer.ai">Vectorizer.ai</option>
+                                        <!-- 4. Video Generation & Motion (61-75) -->
+                                        <option value="Runway Gen-3 Alpha">Runway Gen-3 Alpha</option>
+                                        <option value="Luma Dream Machine">Luma Dream Machine</option>
+                                        <option value="Kling AI">Kling AI (Kuaishou)</option>
+                                        <option value="Pika 1.0">Pika 1.0</option>
+                                        <option value="OpenAI Sora">OpenAI Sora</option>
+                                        <option value="Haiper AI">Haiper AI</option>
+                                        <option value="Kaiber AI">Kaiber AI</option>
+                                        <option value="Synthesia">Synthesia Video Avatars</option>
+                                        <option value="HeyGen">HeyGen Video Translation</option>
+                                        <option value="D-ID">D-ID Digital Humans</option>
+                                        <option value="InVideo AI">InVideo AI</option>
+                                        <option value="Vidu AI">Vidu AI</option>
+                                        <option value="Hedra AI">Hedra AI Character 1</option>
+                                        <option value="Viggle AI">Viggle AI</option>
+                                        <option value="Colossyan">Colossyan Creator</option>
+                                        <!-- 5. Audio, Speech & Music Generation (76-88) -->
+                                        <option value="ElevenLabs">ElevenLabs Voice AI</option>
+                                        <option value="Suno AI v3.5">Suno AI v3.5</option>
+                                        <option value="Udio AI">Udio AI Music</option>
+                                        <option value="OpenAI Whisper">OpenAI Whisper Large</option>
+                                        <option value="Murf.ai">Murf.ai Voice Studio</option>
+                                        <option value="Speechify AI">Speechify AI</option>
+                                        <option value="Descript">Descript AI Audio</option>
+                                        <option value="Stable Audio">Stable Audio 2.0</option>
+                                        <option value="Play.ht">Play.ht Voice Cloning</option>
+                                        <option value="Resemble AI">Resemble AI</option>
+                                        <option value="Voicemod AI">Voicemod AI</option>
+                                        <option value="Lovo.ai">Lovo.ai (Genny)</option>
+                                        <option value="Audiocraft">Audiocraft (Meta)</option>
+                                        <!-- 6. Research, Writing & Productivity (89-100) -->
+                                        <option value="NotebookLM">NotebookLM (Google)</option>
+                                        <option value="Consensus AI">Consensus AI Research</option>
+                                        <option value="Elicit">Elicit Research Assistant</option>
+                                        <option value="Scite.ai">Scite.ai Smart Citations</option>
+                                        <option value="Jasper AI">Jasper AI Marketing</option>
+                                        <option value="Copy.ai">Copy.ai</option>
+                                        <option value="Writesonic">Writesonic / Chatsonic</option>
+                                        <option value="Grammarly AI">Grammarly AI</option>
+                                        <option value="Notion AI">Notion AI</option>
+                                        <option value="Julius AI">Julius AI Data Science</option>
+                                        <option value="Otter.ai">Otter.ai Meeting Transcription</option>
+                                        <option value="Fireflies.ai">Fireflies.ai Notetaker</option>
+                                    </datalist>
+                                </div>
+
+                                <div id="sub_tv_panel" class="hidden space-y-2">
+                                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest font-display">Select TV / Streaming Service</label>
+                                    <select id="db_tvSelect" onchange="window.syncTvSelectionToName()" class="admin-input w-full px-5 py-3.5 rounded-xl text-sm font-bold text-white">
+                                        <option value="Netflix Premium">Netflix Premium (UHD 4K)</option>
+                                        <option value="DSTV Premium">DSTV Premium Stream</option>
+                                        <option value="DSTV Compact Plus">DSTV Compact Plus</option>
+                                        <option value="Showmax Pro">Showmax Pro</option>
+                                        <option value="Amazon Prime Video">Amazon Prime Video</option>
+                                        <option value="Apple TV+">Apple TV+</option>
+                                        <option value="Disney+">Disney+</option>
+                                        <option value="YouTube Premium">YouTube Premium</option>
+                                        <option value="Spotify Premium">Spotify Premium Family</option>
+                                        <option value="Apple Music">Apple Music</option>
                                     </select>
-                                    <i class="fa-solid fa-chevron-down absolute right-5 top-[60%] -translate-y-1/2 text-gray-500 text-xs pointer-events-none"></i>
+                                </div>
+
+                                <div id="sub_data_panel" class="hidden space-y-2">
+                                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest font-display">Select Network / Data Provider</label>
+                                    <select id="db_dataSelect" onchange="window.syncDataSelectionToName()" class="admin-input w-full px-5 py-3.5 rounded-xl text-sm font-bold text-white">
+                                        <option value="MTN SME Data Plan">MTN SME Data Plan</option>
+                                        <option value="Airtel Corporate Data">Airtel Corporate Data</option>
+                                        <option value="Glo Data Bundle">Glo Data Bundle</option>
+                                        <option value="9mobile Data Package">9mobile Data Package</option>
+                                        <option value="Starlink Unlimited Satellite">Starlink Unlimited Satellite</option>
+                                        <option value="Spectranet 4G LTE">Spectranet 4G LTE</option>
+                                        <option value="Smile Communications">Smile 4G LTE</option>
+                                    </select>
+                                </div>
+
+                                <div id="sub_others_panel" class="hidden space-y-2">
+                                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest font-display">Custom Subscription Title</label>
+                                    <input type="text" id="db_customSubName" oninput="window.syncCustomSubToName()" class="admin-input w-full px-5 py-3.5 rounded-xl text-sm" placeholder="Enter custom service / tool name">
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 font-display">Tier / Plan Level</label>
+                                        <input type="text" id="db_subPlanType" class="admin-input w-full px-5 py-3.5 rounded-xl text-sm font-bold" placeholder="e.g. Pro, Premium, Enterprise, 1-Device">
+                                    </div>
+                                    <div class="relative">
+                                        <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 font-display">Duration</label>
+                                        <select id="db_subDuration" class="admin-input appearance-none w-full px-5 py-3.5 rounded-xl text-sm">
+                                            <option value="1 Month">1 Month</option>
+                                            <option value="3 Months">3 Months</option>
+                                            <option value="6 Months">6 Months</option>
+                                            <option value="1 Year">1 Year</option>
+                                            <option value="Lifetime Access">Lifetime Access</option>
+                                        </select>
+                                        <i class="fa-solid fa-chevron-down absolute right-5 top-[60%] -translate-y-1/2 text-gray-500 text-xs pointer-events-none"></i>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1504,7 +1984,26 @@
 
         const subCatSchema = {
             "DIGITAL": ["PRODUCT", "SERVICE", "COURSE", "SUBSCRIPTION", "OTHERS"],
-            "PHYSICAL": ["PRODUCT / GOODS", "PROPERTY", "APPLIANCES", "COURSE / SEMINAR", "SHOWS / EVENTS"]
+            "PHYSICAL": [
+                "SUB_ELECTRONICS_MOBILE", 
+                "SUB_PARTS_HARDWARE", 
+                "SUB_SOLAR_POWER", 
+                "SUB_FASHION_APPAREL", 
+                "SUB_GENERAL_TOOLS",
+                "PRODUCT / GOODS", 
+                "PROPERTY", 
+                "APPLIANCES", 
+                "COURSE / SEMINAR", 
+                "SHOWS / EVENTS"
+            ]
+        };
+
+        const subCatLabels = {
+            "SUB_ELECTRONICS_MOBILE": "Mobile Devices, Tablets & Consumer Electronics",
+            "SUB_PARTS_HARDWARE": "Hardware, Spare Parts & Repair Components",
+            "SUB_SOLAR_POWER": "Solar & Power Equipment",
+            "SUB_FASHION_APPAREL": "Fashion, Apparel & Wearables",
+            "SUB_GENERAL_TOOLS": "General Merchandise & Tools"
         };
 
         window.handleDeliveryModelSwitch = function() {
@@ -1548,7 +2047,10 @@
             const subSelect = document.getElementById('db_subCategory'); 
             if(subSelect) {
                 subSelect.innerHTML = "";
-                (subCatSchema[mainCat] || []).forEach(opt => subSelect.innerHTML += `<option value="${opt}">${opt}</option>`);
+                (subCatSchema[mainCat] || []).forEach(opt => {
+                    const label = subCatLabels[opt] || opt;
+                    subSelect.innerHTML += `<option value="${opt}">${label}</option>`;
+                });
                 window.handleSubCategorySwitch();
             }
         };
@@ -1557,10 +2059,16 @@
             const mainCat = document.getElementById('db_category')?.value || 'DIGITAL';
             const sub = document.getElementById('db_subCategory')?.value || '';
             document.querySelectorAll('.dynamic-info-section').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.phys-sub-panel').forEach(el => el.classList.add('hidden'));
 
             if (mainCat === 'PHYSICAL') { 
                 const pInfo = document.getElementById('info_physical');
                 if(pInfo) pInfo.classList.remove('hidden'); 
+                
+                const targetPanel = document.getElementById(`panel_${sub}`);
+                if(targetPanel) {
+                    targetPanel.classList.remove('hidden');
+                }
             } else {
                 if (sub === 'SERVICE') { 
                     const sInfo = document.getElementById('info_service');
@@ -1686,15 +2194,78 @@
                 let dynamicExtras = {};
 
                 if (category === 'PHYSICAL') {
-                    dynamicExtras = { condition: document.getElementById('db_physCondition')?.value || '', deliveryMode: document.getElementById('db_physDelivery')?.value || '' };
+                    dynamicExtras = { 
+                        condition: document.getElementById('db_physCondition')?.value || '', 
+                        deliveryMode: document.getElementById('db_physDelivery')?.value || '',
+                        weight: Number(document.getElementById('db_physWeight')?.value || 0),
+                        weightUnit: document.getElementById('db_physWeightUnit')?.value || 'kg',
+                        dimensions: {
+                            l: Number(document.getElementById('db_physDimL')?.value || 0),
+                            w: Number(document.getElementById('db_physDimW')?.value || 0),
+                            h: Number(document.getElementById('db_physDimH')?.value || 0),
+                            unit: document.getElementById('db_physDimUnit')?.value || 'cm'
+                        }
+                    };
                     if(mod === 'V4') dynamicExtras.shippingFee = Number(document.getElementById('db_shippingFee')?.value || 0);
+
+                    if (subCategory === 'SUB_ELECTRONICS_MOBILE') {
+                        dynamicExtras.mobile = {
+                            brand: document.getElementById('db_mobileBrand')?.value || '',
+                            model: document.getElementById('db_mobileModel')?.value?.trim() || '',
+                            storage: document.getElementById('db_mobileStorage')?.value || '',
+                            ram: document.getElementById('db_mobileRam')?.value || '',
+                            screen: document.getElementById('db_mobileScreen')?.value?.trim() || '',
+                            battery: document.getElementById('db_mobileBattery')?.value?.trim() || '',
+                            networkLock: document.getElementById('db_mobileLock')?.value || '',
+                            accessories: document.getElementById('db_mobileAccessories')?.value?.trim() || '',
+                            serialNumber: document.getElementById('db_mobileSerial')?.value?.trim() || ''
+                        };
+                    } else if (subCategory === 'SUB_PARTS_HARDWARE') {
+                        dynamicExtras.hardware = {
+                            compatibility: document.getElementById('db_hardwareCompat')?.value?.trim() || '',
+                            category: document.getElementById('db_hardwareCategory')?.value || '',
+                            grade: document.getElementById('db_hardwareGrade')?.value || '',
+                            testingCondition: document.getElementById('db_hardwareTesting')?.value || '',
+                            warranty: document.getElementById('db_hardwareWarranty')?.value || ''
+                        };
+                    } else if (subCategory === 'SUB_SOLAR_POWER') {
+                        dynamicExtras.solar = {
+                            category: document.getElementById('db_solarCategory')?.value || '',
+                            capacity: document.getElementById('db_solarCapacity')?.value?.trim() || '',
+                            voltage: document.getElementById('db_solarVoltage')?.value || '',
+                            chemistry: document.getElementById('db_solarChemistry')?.value || '',
+                            protection: document.getElementById('db_solarProtection')?.value?.trim() || ''
+                        };
+                    } else if (subCategory === 'SUB_FASHION_APPAREL') {
+                        dynamicExtras.fashion = {
+                            gender: document.getElementById('db_fashionGender')?.value || '',
+                            size: document.getElementById('db_fashionSize')?.value?.trim() || '',
+                            color: document.getElementById('db_fashionColor')?.value?.trim() || '',
+                            material: document.getElementById('db_fashionMaterial')?.value || '',
+                            fit: document.getElementById('db_fashionFit')?.value || ''
+                        };
+                    } else if (subCategory === 'SUB_GENERAL_TOOLS') {
+                        dynamicExtras.tools = {
+                            category: document.getElementById('db_toolsCategory')?.value || '',
+                            powerSource: document.getElementById('db_toolsPower')?.value || '',
+                            grade: document.getElementById('db_toolsGrade')?.value || ''
+                        };
+                    }
                 } else if (subCategory === 'SERVICE') {
                     dynamicExtras = { turnaroundTime: document.getElementById('db_servTime')?.value?.trim() || '', deliverables: document.getElementById('db_servDeliverables')?.value?.trim() || '' };
                 } else if (subCategory === 'COURSE' || subCategory === 'COURSE / SEMINAR') {
                     dynamicExtras = { instructor: document.getElementById('db_courseInstructor')?.value?.trim() || '', duration: document.getElementById('db_courseDuration')?.value?.trim() || '' };
                 } else if (subCategory === 'SUBSCRIPTION') {
                     dynamicName = document.getElementById('db_subDisplayTitle')?.value?.trim() || dynamicName;
-                    dynamicExtras = { subscriptionType: document.getElementById('db_subType')?.value || '', planTier: document.getElementById('db_subPlanType')?.value?.trim() || '', duration: document.getElementById('db_subDuration')?.value || '', accountType: document.getElementById('db_subAccountType')?.value || '' };
+                    dynamicExtras = { 
+                        subscriptionType: document.getElementById('db_subType')?.value || '', 
+                        selectedAi: document.getElementById('db_aiSelect')?.value || '',
+                        selectedTv: document.getElementById('db_tvSelect')?.value || '',
+                        selectedData: document.getElementById('db_dataSelect')?.value || '',
+                        customSub: document.getElementById('db_customSubName')?.value?.trim() || '',
+                        planTier: document.getElementById('db_subPlanType')?.value?.trim() || '', 
+                        duration: document.getElementById('db_subDuration')?.value || '' 
+                    };
                 }
                 
                 const cleanDynamicExtras = JSON.parse(JSON.stringify(dynamicExtras));
@@ -1769,6 +2340,68 @@
                     let imgVal = l.imageUrl || (l.media && l.media.promotionalFlyer ? l.media.promotionalFlyer[0] : '');
                     const imgInput = document.getElementById('db_promotionalFlyer'); if(imgInput) imgInput.value = imgVal;
                     const tagsInput = document.getElementById('db_searchTags'); if(tagsInput) tagsInput.value = (l.searchTags || []).join(', ');
+
+                    const extras = l.specificDetails || {};
+                    if(l.category === 'PHYSICAL') {
+                        if(document.getElementById('db_physCondition')) document.getElementById('db_physCondition').value = extras.condition || 'Brand New';
+                        if(document.getElementById('db_physDelivery')) document.getElementById('db_physDelivery').value = extras.deliveryMode || 'Standard Shipping';
+                        if(document.getElementById('db_physWeight')) document.getElementById('db_physWeight').value = extras.weight || '';
+                        if(document.getElementById('db_physWeightUnit')) document.getElementById('db_physWeightUnit').value = extras.weightUnit || 'kg';
+                        if(extras.dimensions) {
+                            if(document.getElementById('db_physDimL')) document.getElementById('db_physDimL').value = extras.dimensions.l || '';
+                            if(document.getElementById('db_physDimW')) document.getElementById('db_physDimW').value = extras.dimensions.w || '';
+                            if(document.getElementById('db_physDimH')) document.getElementById('db_physDimH').value = extras.dimensions.h || '';
+                            if(document.getElementById('db_physDimUnit')) document.getElementById('db_physDimUnit').value = extras.dimensions.unit || 'cm';
+                        }
+                        if(extras.mobile) {
+                            if(document.getElementById('db_mobileBrand')) document.getElementById('db_mobileBrand').value = extras.mobile.brand || 'Apple';
+                            if(document.getElementById('db_mobileModel')) document.getElementById('db_mobileModel').value = extras.mobile.model || '';
+                            if(document.getElementById('db_mobileStorage')) document.getElementById('db_mobileStorage').value = extras.mobile.storage || '128GB';
+                            if(document.getElementById('db_mobileRam')) document.getElementById('db_mobileRam').value = extras.mobile.ram || '8GB';
+                            if(document.getElementById('db_mobileScreen')) document.getElementById('db_mobileScreen').value = extras.mobile.screen || '';
+                            if(document.getElementById('db_mobileBattery')) document.getElementById('db_mobileBattery').value = extras.mobile.battery || '';
+                            if(document.getElementById('db_mobileLock')) document.getElementById('db_mobileLock').value = extras.mobile.networkLock || 'Factory Unlocked';
+                            if(document.getElementById('db_mobileAccessories')) document.getElementById('db_mobileAccessories').value = extras.mobile.accessories || '';
+                            if(document.getElementById('db_mobileSerial')) document.getElementById('db_mobileSerial').value = extras.mobile.serialNumber || '';
+                        }
+                        if(extras.hardware) {
+                            if(document.getElementById('db_hardwareCompat')) document.getElementById('db_hardwareCompat').value = extras.hardware.compatibility || '';
+                            if(document.getElementById('db_hardwareCategory')) document.getElementById('db_hardwareCategory').value = extras.hardware.category || 'Screen / Display Assembly';
+                            if(document.getElementById('db_hardwareGrade')) document.getElementById('db_hardwareGrade').value = extras.hardware.grade || 'Original OEM Pull';
+                            if(document.getElementById('db_hardwareTesting')) document.getElementById('db_hardwareTesting').value = extras.hardware.testingCondition || '100% Tested Working';
+                            if(document.getElementById('db_hardwareWarranty')) document.getElementById('db_hardwareWarranty').value = extras.hardware.warranty || '30 Days Warranty';
+                        }
+                        if(extras.solar) {
+                            if(document.getElementById('db_solarCategory')) document.getElementById('db_solarCategory').value = extras.solar.category || 'Monocrystalline Solar Panels';
+                            if(document.getElementById('db_solarCapacity')) document.getElementById('db_solarCapacity').value = extras.solar.capacity || '';
+                            if(document.getElementById('db_solarVoltage')) document.getElementById('db_solarVoltage').value = extras.solar.voltage || '12V';
+                            if(document.getElementById('db_solarChemistry')) document.getElementById('db_solarChemistry').value = extras.solar.chemistry || 'LiFePO4 (Lithium Iron Phosphate)';
+                            if(document.getElementById('db_solarProtection')) document.getElementById('db_solarProtection').value = extras.solar.protection || '';
+                        }
+                        if(extras.fashion) {
+                            if(document.getElementById('db_fashionGender')) document.getElementById('db_fashionGender').value = extras.fashion.gender || 'Men';
+                            if(document.getElementById('db_fashionSize')) document.getElementById('db_fashionSize').value = extras.fashion.size || '';
+                            if(document.getElementById('db_fashionColor')) document.getElementById('db_fashionColor').value = extras.fashion.color || '';
+                            if(document.getElementById('db_fashionMaterial')) document.getElementById('db_fashionMaterial').value = extras.fashion.material || '100% Pure Cotton';
+                            if(document.getElementById('db_fashionFit')) document.getElementById('db_fashionFit').value = extras.fashion.fit || 'Regular Fit';
+                        }
+                        if(extras.tools) {
+                            if(document.getElementById('db_toolsCategory')) document.getElementById('db_toolsCategory').value = extras.tools.category || 'Power Tools (Drills, Saws, Grinders)';
+                            if(document.getElementById('db_toolsPower')) document.getElementById('db_toolsPower').value = extras.tools.powerSource || 'Cordless Battery (18V-20V)';
+                            if(document.getElementById('db_toolsGrade')) document.getElementById('db_toolsGrade').value = extras.tools.grade || 'Professional Tradesman';
+                        }
+                    } else if (l.subCategory === 'SUBSCRIPTION') {
+                        if(document.getElementById('db_subType')) {
+                            document.getElementById('db_subType').value = extras.subscriptionType || 'AI_SUBSCRIPTION';
+                            window.handleSubscriptionTypeSwitch();
+                        }
+                        if(document.getElementById('db_aiSelect')) document.getElementById('db_aiSelect').value = extras.selectedAi || '';
+                        if(document.getElementById('db_tvSelect')) document.getElementById('db_tvSelect').value = extras.selectedTv || '';
+                        if(document.getElementById('db_dataSelect')) document.getElementById('db_dataSelect').value = extras.selectedData || '';
+                        if(document.getElementById('db_customSubName')) document.getElementById('db_customSubName').value = extras.customSub || '';
+                        if(document.getElementById('db_subPlanType')) document.getElementById('db_subPlanType').value = extras.planTier || '';
+                        if(document.getElementById('db_subDuration')) document.getElementById('db_subDuration').value = extras.duration || '1 Month';
+                    }
 
                     window.scrollTo({top: 0, behavior: 'smooth'});
                 }, 50);
@@ -2119,7 +2752,15 @@
             });
         };
 
-        window.closeMobileChat = function() { document.getElementById('activeChatArea').classList.add('hidden'); document.getElementById('activeChatArea').classList.remove('flex'); document.getElementById('chatListSidebar').classList.remove('hidden'); window.currentChatId = null; if(window.presenceUnsubscribe) window.presenceUnsubscribe(); window.renderChatContacts(); };
+        window.closeMobileChat = function() { 
+            document.getElementById('activeChatArea').classList.add('hidden'); 
+            document.getElementById('activeChatArea').classList.remove('flex'); 
+            document.getElementById('chatListSidebar').classList.remove('hidden'); 
+            window.currentChatId = null; 
+            if(window.presenceUnsubscribe) window.presenceUnsubscribe(); 
+            if(window.chatUnsubscribe) window.chatUnsubscribe(); 
+            window.renderChatContacts(); 
+        };
         window.initReply = function(msgId, text) { window.replyingToMsgId = msgId; document.getElementById('replyTextPreview').innerText = text; document.getElementById('replyBanner').classList.remove('hidden'); document.getElementById('chatInput').focus(); };
         window.cancelReply = function() { window.replyingToMsgId = null; document.getElementById('replyBanner').classList.add('hidden'); document.getElementById('replyTextPreview').innerText = ''; };
 
@@ -2138,7 +2779,11 @@
             input.value = ""; input.style.height = ''; window.cancelChatImage(); window.cancelReply();
             try { 
                 await addDoc(collection(db, `chats/${window.currentChatId}/messages`), payload); 
-                await updateDoc(doc(db, "chats", window.currentChatId), { lastMessageAt: serverTimestamp() });
+                await updateDoc(doc(db, "chats", window.currentChatId), { 
+                    lastMessage: img ? 'Sent an image' : text,
+                    lastMessageAt: serverTimestamp(),
+                    lastMessageTime: serverTimestamp()
+                });
             } catch(e) { window.showToast("Message Failed to Send.", true); }
         };
 

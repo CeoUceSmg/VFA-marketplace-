@@ -114,7 +114,7 @@
 
     <!-- Confirm Delivery Modal -->
     <div id="confirmDeliveryModal" class="overlay-mask fixed inset-0 z-[200] flex items-center justify-center p-4">
-        <div class="glass-card p-8 rounded-[2rem] w-full max-w-md transform transition-all duration-300 relative border-brand-emerald/30 shadow-neon-emerald">
+        <div class="glass-card p-8 rounded-[2rem] w-full max-w-md max-h-[90dvh] overflow-y-auto custom-scrollbar transform transition-all duration-300 relative border-brand-emerald/30 shadow-neon-emerald">
             <div class="w-16 h-16 rounded-2xl bg-brand-emerald/10 flex items-center justify-center mb-6 border border-brand-emerald/30 shadow-[inset_0_1px_0_rgba(0,255,157,0.2)]">
                 <i class="fa-solid fa-box-check text-3xl text-brand-emerald animate-pulse-glow"></i>
             </div>
@@ -138,7 +138,7 @@
 
     <!-- Refund Modal -->
     <div id="refundModal" class="overlay-mask fixed inset-0 z-[200] flex items-center justify-center p-4">
-        <div class="glass-card p-8 rounded-[2rem] w-full max-w-md transform transition-all duration-300 relative border-brand-pink/30 shadow-neon-pink">
+        <div class="glass-card p-8 rounded-[2rem] w-full max-w-md max-h-[90dvh] overflow-y-auto custom-scrollbar transform transition-all duration-300 relative border-brand-pink/30 shadow-neon-pink">
             <h3 class="text-2xl font-display font-black text-white mb-2 flex items-center gap-3"><i class="fa-solid fa-rotate-left text-brand-pink"></i> Dispute & Refund</h3>
             <p class="text-xs text-gray-400 mb-8 font-medium border-b border-white/10 pb-4">Applicable within 3 days of delivery. Super Admin arbitration required.</p>
             
@@ -175,7 +175,7 @@
 
     <!-- Report Seller Modal -->
     <div id="reportModal" class="overlay-mask fixed inset-0 z-[200] flex items-center justify-center p-4">
-        <div class="glass-card p-8 rounded-[2rem] w-full max-w-md transform transition-all duration-300 relative border-brand-gold/30 shadow-neon-gold">
+        <div class="glass-card p-8 rounded-[2rem] w-full max-w-md max-h-[90dvh] overflow-y-auto custom-scrollbar transform transition-all duration-300 relative border-brand-gold/30 shadow-neon-gold">
             <h3 class="text-2xl font-display font-black text-white mb-2 flex items-center gap-3"><i class="fa-solid fa-flag text-brand-gold"></i> Report Entity</h3>
             <p class="text-xs text-gray-400 mb-8 font-medium border-b border-white/10 pb-4">Violations are transmitted directly to Super Admin.</p>
             
@@ -432,6 +432,7 @@
                                 <div class="min-w-0 cursor-pointer" onclick="window.openNetworkSearchForVendor()">
                                     <h4 class="font-bold text-gray-900 text-base truncate leading-tight" id="chatHeaderTitle">Vendor Name</h4>
                                     <p class="text-[11px] text-gray-600 truncate font-mono bg-white px-2 py-0.5 rounded border border-gray-200 mt-1 inline-block font-medium shadow-sm" id="chatHeaderProduct">Product Title</p>
+                                    <p class="text-[10px] text-green-600 font-semibold italic opacity-0 transition-opacity h-0 overflow-hidden" id="chatTypingIndicator">Typing...</p>
                                 </div>
                             </div>
                             <div class="flex items-center gap-1.5 pr-2">
@@ -1469,6 +1470,17 @@
                 else { ind.classList.replace('bg-green-500', 'bg-gray-400'); }
             });
 
+            if(window.typingUnsubscribe) window.typingUnsubscribe();
+            window.typingUnsubscribe = onSnapshot(doc(db, "chats", chatId), (docSnap) => {
+                const typingInd = document.getElementById('chatTypingIndicator');
+                if (!typingInd) return;
+                if(docSnap.exists() && docSnap.data()[`typing_${vendorId}`] === true) {
+                    typingInd.classList.remove('opacity-0', 'h-0', 'overflow-hidden');
+                } else {
+                    typingInd.classList.add('opacity-0', 'h-0', 'overflow-hidden');
+                }
+            });
+
             // Initialize chat document if it doesn't exist
             const chatRef = doc(db, "chats", chatId);
             try {
@@ -1577,8 +1589,30 @@
             document.getElementById('chatListSidebar').classList.remove('hidden');
             window.currentChatId = null;
             if(window.presenceUnsubscribe) window.presenceUnsubscribe();
+            if(window.typingUnsubscribe) window.typingUnsubscribe();
+            if(window.chatUnsubscribe) window.chatUnsubscribe();
             window.renderChatContacts();
         };
+
+        let isBuyerTyping = false;
+        let buyerTypingTimeout = null;
+        document.addEventListener('DOMContentLoaded', () => {
+            const chatInp = document.getElementById('chatInput');
+            if (chatInp) {
+                chatInp.addEventListener('input', () => {
+                    if(!window.currentChatId || !window.currentUser) return;
+                    if(!isBuyerTyping) {
+                        isBuyerTyping = true;
+                        updateDoc(doc(db, "chats", window.currentChatId), { [`typing_${window.currentUser.uid}`]: true }).catch(()=>{});
+                    }
+                    clearTimeout(buyerTypingTimeout);
+                    buyerTypingTimeout = setTimeout(() => {
+                        isBuyerTyping = false;
+                        updateDoc(doc(db, "chats", window.currentChatId), { [`typing_${window.currentUser.uid}`]: false }).catch(()=>{});
+                    }, 1500);
+                });
+            }
+        });
 
         window.initReply = function(msgId, text) {
             window.replyingToMsgId = msgId;
